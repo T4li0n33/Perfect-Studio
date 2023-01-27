@@ -46,7 +46,7 @@ int main()
 	bool opengl_presentation_mode = false;
 	bool close_window = false;
 	bool opengl_mode_exit = false;
-	int base_x = 0, base_y = 0, base_z = 0;
+	float base_x = 0, base_y = 0, base_z = 0;
 	int shelf_number = 0, shelf_ration[4]{0,0,0,0};
 	int drawer_number = 0, drawer_ratio[4]{ 0,0,0,0 };
 	const unsigned int width = 1200;
@@ -72,9 +72,7 @@ int main()
 	glViewport(0,0,width,height); //Viewport
 
 
-	Structure s1(6,1);
-	//Converter c1;
-	
+	Structure s1(18,3);
 
 	EBO EBO1(s1.GetCuboidIndices(), s1.GetMaxIndexCount());
 
@@ -89,15 +87,11 @@ int main()
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Position));
 	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Color));
 	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Texture));
-
-	auto test = s1.GetCuboidIndices();
 	
 	
 	VAO1.Unbind();
 	VBO1.Unbind();
 	
-
-
 	Texture projectTexture("Texture.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	projectTexture.texUnit(shaderProgram, "tex0", 0);
 
@@ -205,14 +199,14 @@ int main()
 			
 			ImGui::Text("Wpisz szerokosc :");
 			ImGui::SameLine();
-			ImGui::InputInt("##Width", &base_x, 0, 0,  ImGuiInputTextFlags_CharsNoBlank);
-			ImGui::Text("Wpisz glebokosc :");
-			ImGui::SameLine();
-			ImGui::InputInt("##Lenght", &base_y, 0, 0, ImGuiInputTextFlags_CharsNoBlank);  // Wardrobe size inputs
-			
+			ImGui::InputFloat("##Width", &base_x, 0, 0);
 			ImGui::Text("Wpisz wysokosc :");
 			ImGui::SameLine();
-			ImGui::InputInt("##Height", &base_z, 0, 0, ImGuiInputTextFlags_CharsNoBlank);
+			ImGui::InputFloat("##Lenght", &base_y, 0, 0);  // Wardrobe size inputs
+			
+			ImGui::Text("Wpisz glebokosc :");
+			ImGui::SameLine();
+			ImGui::InputFloat("##Height", &base_z, 0, 0);
 			
 			if (base_x != 0 && base_y != 0 && base_z != 0)wardrobe_size_placed = true;
 			ImGui::Text("=================================");
@@ -318,15 +312,16 @@ int main()
 			VBO1.Bind();
 			VAO1.Bind();
 			EBO1.Bind();
+
 			/*std::array<Converter::Element, 300> elems{};
 			Converter::Element* e_buffer = elems.data();
 			e_buffer = c1.Calculate(e_buffer, base_x, base_y, base_z, shelf_number);*/
 
-			array<Structure::Vertex, 1000> vertices = s1.Draw_Structure(base_x, base_y, base_z, 1);
 
-			glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Structure::Vertex), vertices.data());
-			
+			s1.DrawStructure(base_x, base_y, base_z, s1.GetMaxVertexCount());
+			glBufferSubData(GL_ARRAY_BUFFER, 0, s1.Vertices.size()*(sizeof(Structure::Vertex)), s1.Vertices.data());
 			glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);
+		
 			ImGui::SetNextWindowPos(ImVec2(1000, 700));
 			
 			ImGui::Begin("Podglad 3D", &showWindow2, ImGuiWindowFlags_NoSavedSettings); //3D Projection Mode
@@ -340,8 +335,9 @@ int main()
 				ImGui::End();
 				projectTexture.Unbind();
 				VAO1.Unbind();
+				s1.ClearVector();
 			};
-			if (!io.WantCaptureMouse)
+			if (!io.WantCaptureMouse) // Handles Camera input based on cursor position
 			{
 				camera.Inputs(window);
 				camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
@@ -350,17 +346,20 @@ int main()
 
 		};
 
-		if (project_mode == true && showWindow == false)
-		{
-			showWindow = true;
-			project_mode = false;
+		//[Validation] Close window repairs
+		{ 
+			if (project_mode == true && showWindow == false)
+			{
+				showWindow = true;
+				project_mode = false;
+			}
+			if (opengl_presentation_mode == true && showWindow2 == false)
+			{
+				showWindow2 = true;
+				opengl_presentation_mode = false;
+			};
 		}
-		if (opengl_presentation_mode == true && showWindow2 == false)
-		{
-			showWindow2 = true;
-			opengl_presentation_mode = false;
-		};
-		//Close window repairs
+		
 
 
 		//[Sector] Calculator_Mode 
@@ -391,6 +390,7 @@ int main()
 			EBO1.Delete();
 			projectTexture.Delete();
 			shaderProgram.Delete();
+			s1.~Structure();
 			return 0;
 		}; //Exit Button
 	}

@@ -11,7 +11,7 @@ class Structure
 	size_t MaxVertexCount;
 	size_t MaxIndexCount;
 	GLuint* CuboidIndices;
-
+	
 	public:
 
 		struct Vec2
@@ -32,15 +32,17 @@ class Structure
 		};
 
 
-	Structure(size_t MaxQuadCount, int loop);
+	Structure(size_t MaxQuadCount, int loop); 
 	~Structure();
-
-	Vertex* CreateCuboid(Vertex* target, float x, float y, float z);
-	void Create_Indicies(int loop_amount);
-	void SetVariables(size_t MaxQuadCount);
-	std::array<Structure::Vertex, 1000> Draw_Structure(float x, float y, float z, GLuint type);
-	size_t GetMaxQuadCount();
-	size_t GetMaxVertexCount();
-	size_t GetMaxIndexCount();
-	GLuint* GetCuboidIndices();
+	std::vector<Vertex> Vertices;
+	Vertex* CreateCuboid(Vertex* target, float x, float y, float z, float side); // Creates a single Cuboid based on passed values 
+	void Create_Indicies(int loop_amount); // Generates Indices of triangles that will be made
+	void SetVariables(size_t MaxQuadCount); // Sets all Structure Class members (such as MaxQuadCount, MaxVertexCount, MaxIndexCount)
+	void DrawStructure(float x, float y, float z, GLuint NumberofCuboids); // Creates Structure of Cuboids (use CreateCuboid func.)
+	size_t GetMaxQuadCount(); //Returns MaxQuad
+	size_t GetMaxVertexCount(); //Returns MaxVertex
+	size_t GetMaxIndexCount(); //Returns MaxIndex
+	GLuint* GetCuboidIndices(); // Returns Cuboid Indicies (used for traingle draw)
+	std::vector<Structure::Vertex> GetVertices(); //Returns current Verticies vector
+	void ClearVector(); // Clears the Verticies vector (one that is beeing sent to OpenGl vertex buffer)
 };
