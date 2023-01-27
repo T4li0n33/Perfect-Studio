@@ -19,48 +19,48 @@ void Structure::Create_Indicies(int loop_amount)
 	this->CuboidIndices = CuboidIndices;
 }
 
-Structure::Vertex* Structure::CreateCuboid(Vertex* target, float x, float y, float z, float side)//Creating cuboid based on input values
+Structure::Vertex* Structure::CreateCuboid(Vertex* target, float x, float y, float z, float side, float top, float back)//Creating cuboid based on input values
 {
 	int i = 0;
 	float thickness = 0.18f;
 	float crossbar = 1.0f;
 
-	target[i].Position = { 0.0f + side, 0.0f,  0.0f }; // 0
+	target[i].Position = { 0.0f + side, 0.0f + top,  0.0f +back }; // 0
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 0.0f, 0.0f };
 	i++;
 
-	target[i].Position = { 0.0f + side, y, 0.0f }; // 1
+	target[i].Position = { 0.0f + side, y + top, 0.0f + back }; // 1
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 0.0f, 1.0f };
 	i++;
 
-	target[i].Position = { x + side, y, 0.0f }; // 2
+	target[i].Position = { x + side, y + top, 0.0f + back }; // 2
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 1.0f, 1.0f };
 	i++;
 
-	target[i].Position = { x + side,  0.0f,  0.0f }; //3
+	target[i].Position = { x + side,  0.0f + top,  0.0f + back }; //3
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 1.0f, 0.0f };
 	i++;
 
-	target[i].Position = { 0.0f + side,  0.0f, z };//4
+	target[i].Position = { 0.0f + side,  0.0f + top, z + back };//4
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 0.0f, 0.0f };
 	i++;
 
-	target[i].Position = { 0.0f + side, y, z };//5
+	target[i].Position = { 0.0f + side, y + top, z + back };//5
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 0.0f, 1.0f };
 	i++;
 
-	target[i].Position = { x + side, y, z };//6
+	target[i].Position = { x + side, y + top, z + back };//6
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 1.0f, 1.0f };
 	i++;
 
-	target[i].Position = { x + side,  0.0f, z };//7
+	target[i].Position = { x + side,  0.0f + top, z + back };//7
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 1.0f, 0.0f };
 	i++;
@@ -81,7 +81,7 @@ Structure::~Structure()
 	
 }
 
-void Structure::DrawStructure(float x, float y, float z, GLuint NumberofCuboids)
+void Structure::DrawStructure(float x, float y, float z, GLuint NumberofCuboids, int shelf_amount)
 {
 	GLuint VertexAmount = 8 * NumberofCuboids;
 	float xu, yu, zu;
@@ -89,8 +89,7 @@ void Structure::DrawStructure(float x, float y, float z, GLuint NumberofCuboids)
 	yu = y / 100.0f;
 	zu = z / 100.0f;
 	Vertex* vertices = new Vertex[VertexAmount+1];
-	vertices = (Structure::CreateCuboid(vertices, xu, 0.18f, zu , 0));
-	//Structure::Vertex* buffer = vertices;
+	vertices = (Structure::CreateCuboid(vertices, xu, 0.18f, zu , 0.0f, 0.0f, 0.0f));
 	if (Vertices.size() < VertexAmount)
 	{
 		for (int i = 0; i < 8; i++)
@@ -99,8 +98,7 @@ void Structure::DrawStructure(float x, float y, float z, GLuint NumberofCuboids)
 		}
 	}
 
-	vertices = (Structure::CreateCuboid(vertices, 0.18f, yu, zu, 0.0f));
-	//Structure::Vertex* buffer = vertices;
+	vertices = (Structure::CreateCuboid(vertices, 0.18f, yu, zu, 0.0f, 0.0f, 0.0f));
 	if (Vertices.size() < VertexAmount)
 	{
 		for (int i = 0; i < 8; i++)
@@ -109,8 +107,7 @@ void Structure::DrawStructure(float x, float y, float z, GLuint NumberofCuboids)
 		}
 	}
 
-	vertices = (Structure::CreateCuboid(vertices, 0.18f, yu, zu, xu));
-	//Structure::Vertex* buffer = vertices;
+	vertices = (Structure::CreateCuboid(vertices, 0.18f, yu, zu, xu, 0.0f, 0.0f));
 	if (Vertices.size() < VertexAmount)
 	{
 		for (int i = 0; i < 8; i++)
@@ -120,8 +117,7 @@ void Structure::DrawStructure(float x, float y, float z, GLuint NumberofCuboids)
 	}
 	
 
-	vertices = (Structure::CreateCuboid(vertices, xu, 0.18f, zu, 0.0f));
-	//Structure::Vertex* buffer = vertices;
+	vertices = (Structure::CreateCuboid(vertices, xu + 0.18f, 0.18f, 1.0f, 0.0f, yu - 0.18f, 0.0f));
 	if (Vertices.size() < VertexAmount)
 	{
 		for (int i = 0; i < 8; i++)
@@ -130,6 +126,30 @@ void Structure::DrawStructure(float x, float y, float z, GLuint NumberofCuboids)
 		}
 	}
 
+	vertices = (Structure::CreateCuboid(vertices, xu + 0.18f, 0.18f, -1.0f, 0.0f, yu - 0.18f, zu));
+	if (Vertices.size() < VertexAmount)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			Vertices.push_back(vertices[i]);
+		}
+	}
+
+	if (shelf_amount != 0)
+	{
+
+		for (int i = 0; i < shelf_amount; i++)
+		{
+			vertices = (Structure::CreateCuboid(vertices, xu, 0.18f, zu, 0.0f, (yu / (shelf_amount + 1)), 0.0f));
+			if (Vertices.size() < VertexAmount)
+			{
+				for (int i = 0; i < 8; i++)
+				{
+					Vertices.push_back(vertices[i]);
+				}
+			}
+		}
+	}
 }
 
 size_t Structure::GetMaxQuadCount()
