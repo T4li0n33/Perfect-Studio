@@ -72,7 +72,7 @@ int main()
 	glViewport(0,0,width,height); //Viewport
 
 
-	Structure s1(44,7);
+	Structure s1(36,6);
 
 	EBO EBO1(s1.GetCuboidIndices(), s1.GetMaxIndexCount());
 
@@ -91,8 +91,8 @@ int main()
 	
 	VAO1.Unbind();
 	VBO1.Unbind();
-	
-	Texture projectTexture("Texture2.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+	Texture projectTexture("Texture.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	projectTexture.texUnit(shaderProgram, "tex0", 0);
 
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
@@ -312,12 +312,8 @@ int main()
 			VBO1.Bind();
 			VAO1.Bind();
 			EBO1.Bind();
-
-			/*std::array<Converter::Element, 300> elems{};
-			Converter::Element* e_buffer = elems.data();
-			e_buffer = c1.Calculate(e_buffer, base_x, base_y, base_z, shelf_number);*/
-
-
+			Converter c1;
+			c1.Calculate(base_x, base_y, base_z, shelf_number, drawer_number);
 			s1.DrawStructure(base_x, base_y, base_z, s1.GetMaxVertexCount(), shelf_number);
 			glBufferSubData(GL_ARRAY_BUFFER, 0, s1.Vertices.size()*(sizeof(Structure::Vertex)), s1.Vertices.data());
 			glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);

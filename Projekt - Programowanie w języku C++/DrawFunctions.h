@@ -37,7 +37,7 @@ class Structure
 	std::vector<Vertex> Vertices;
 	Vertex* CreateCuboid(Vertex* target, float x, float y, float z, float side, float top, float back); // Creates a single Cuboid based on passed values 
 	void Create_Indicies(int loop_amount); // Generates Indices of triangles that will be made
-	void SetVariables(size_t MaxQuadCount); // Sets all Structure Class members (such as MaxQuadCount, MaxVertexCount, MaxIndexCount)
+	void SetVariables(size_t MaxStructures); // Sets all Structure Class members (such as MaxQuadCount, MaxVertexCount, MaxIndexCount)
 	void DrawStructure(float x, float y, float z, GLuint NumberofCuboids, int shelf_amount); // Creates Structure of Cuboids (use CreateCuboid func.)
 	size_t GetMaxQuadCount(); //Returns MaxQuad
 	size_t GetMaxVertexCount(); //Returns MaxVertex
