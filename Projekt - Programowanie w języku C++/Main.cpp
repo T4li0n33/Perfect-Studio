@@ -6,7 +6,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <gl/GL.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -20,39 +20,18 @@
 #include <array>
 #include "DrawFunctions.h"
 #include "Converter.h"
+#include "Settings.h"
+#include "Wardrobe.h"
 
 using namespace std;
 
 int main()
 {
-	static bool showWindow = true, showWindow2 = true; //To change stuff
-	bool project_mode = false;
-	bool exit = false;
-	bool calc_mode = false;
-	bool wardrobe_type_bottom = false;
-	bool wardrobe_type_top = false;
-	bool wardrobe_type_unusual = false;
-	bool wardrobe_model_shelf = false;
-	bool wardrobe_model_drawer = false;
-	bool wardrobe_model_corner = false;
-	bool wardrobe_model_cargo = false;
-	bool auto_shelf_ratio = true;
-	bool auto_drawer_ratio = true;
-	bool wardrobe_corner_lemans = false;
-	bool wardrobe_corner_shelf = false;
-	bool wardrobe_type_choosed = false;
-	bool wardrobe_model_choosed = false;
-	bool wardrobe_size_placed = false;
-	bool opengl_presentation_mode = false;
-	bool close_window = false;
-	bool opengl_mode_exit = false;
-	float base_x = 0, base_y = 0, base_z = 0;
-	int shelf_number = 0, shelf_ration[4]{0,0,0,0};
-	int drawer_number = 0, drawer_ratio[4]{ 0,0,0,0 };
-	const unsigned int width = 1200;
-	const unsigned int height = 800;
-	
-
+	Settings settings;
+	Wardrobe wardrobe;
+	Camera camera(settings.WindowWidth(), settings.WindowHeight(), glm::vec3(0.0f, 0.0f, 2.0f));
+	Converter c1;
+	Structure s1(c1, wardrobe);
 
 	glfwInit();
 
@@ -60,7 +39,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //GLFW Presets
 
-	GLFWwindow* window = glfwCreateWindow(width, height, "Ortega - Konwerter wymiarow geometrycznych", NULL, NULL); //Creating an GlFW window
+	GLFWwindow* window = glfwCreateWindow(settings.WindowWidth(), settings.WindowHeight(), "Ortega - Konwerter wymiarow geometrycznych", NULL, NULL); //Creating an GlFW window
 	if (window == NULL)
 	{
 		cout << "Failed to create a window" << endl;
@@ -69,35 +48,7 @@ int main()
 
 	glfwMakeContextCurrent(window);
 	gladLoadGL();
-	glViewport(0,0,width,height); //Viewport
-
-
-	Structure s1(36,6);
-
-	EBO EBO1(s1.GetCuboidIndices(), s1.GetMaxIndexCount());
-
-	EBO1.Unbind();
-
-	Shader shaderProgram("default.vert", "default.frag");
-	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
-	VAO VAO1;
-	VAO1.Bind();
-	VBO VBO1(s1.GetMaxVertexCount());
-
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Position));
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Color));
-	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Texture));
-	
-	
-	VAO1.Unbind();
-	VBO1.Unbind();
-
-	Texture projectTexture("Texture.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	projectTexture.texUnit(shaderProgram, "tex0", 0);
-
-	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
-	glClear(GL_COLOR_BUFFER_BIT); // Clearing Buffer
-
+	glViewport(0,0, settings.WindowWidth(), settings.WindowHeight()); //Viewport
 
 
 	IMGUI_CHECKVERSION();
@@ -107,14 +58,16 @@ int main()
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330"); // Standard ImGui presets
 	glEnable(GL_DEPTH_TEST);
-
-
-
-	
-
-
+	Shader shaderProgram("default.vert", "default.frag");
+	Texture projectTexture("Texture.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	EBO EBO1;
+	VAO VAO1;
+	VBO VBO1;
 	while (!glfwWindowShouldClose(window))
 	{
+
+		
+
 		shaderProgram.Activate();
 		
 
@@ -145,154 +98,178 @@ int main()
 			ImGui::SetCursorPos(ImVec2(75, 90));
 			if (ImGui::Button("Tryb projektowy", ImVec2(250, 40))) {
 					
-				project_mode = true;
+				settings.SetMode(1);
 				
 			};
 
 			ImGui::SetCursorPos(ImVec2(75, 150));
 			if (ImGui::Button("Kalkulator wycen", ImVec2(250, 40)))
 			{
-				calc_mode = true;
+				settings.SetMode(2);
 			};
 
 			ImGui::SetCursorPos(ImVec2(75, 210));
 			if (ImGui::Button("Wyjscie", ImVec2(250, 40))) {
 			
-				exit = true;
+				settings.SetMode(4);
 			};
 
 		}ImGui::End();
 
 
 		//[Sector] Project_mode
-		if (project_mode == true && showWindow == true) // Project_mode options
-		{
+		if (settings.GetMode(1) && settings.GetWindow(1)) // Project_mode options
+		{	
+			bool x = true, a = wardrobe.GetWardrobeType(1), b = wardrobe.GetWardrobeType(2), c = wardrobe.GetWardrobeType(3);
 			ImGui::SetNextWindowPos(ImVec2(400, 0));
 			ImGui::SetNextWindowSize(ImVec2(800, 450));
-			ImGui::Begin("Tryb Projektowy", &showWindow, ImGuiWindowFlags_NoSavedSettings);
-
-			ImGui::Text("Jest to okno trybu projektowego");
-			if (!wardrobe_type_bottom && !wardrobe_type_top && !wardrobe_type_unusual) { ImGui::Text("Wybierz rodzaj szafki"); };
-
-			if (ImGui::Checkbox("Szafka dolna", &wardrobe_type_bottom))
+			ImGui::Begin("Tryb Projektowy", &x, ImGuiWindowFlags_NoSavedSettings);
+			if (!x)
 			{
-				wardrobe_type_top = false;
-				wardrobe_type_unusual = false;
+				settings.SetWindow(1);
+				x = !x;
+			}
+			//ImGui::Text("Jest to okno trybu projektowego");
+			if (!wardrobe.GetWardrobeType(1) && !wardrobe.GetWardrobeType(2) && !wardrobe.GetWardrobeType(3)) { ImGui::Text("Wybierz rodzaj szafki"); };
+			
+			if (ImGui::Checkbox("Szafka dolna", &a))
+			{
+				wardrobe.SetWardrobeType(1);
 			};
 			ImGui::SameLine();
-			if (ImGui::Checkbox("Szafka gorna", &wardrobe_type_top))								// Choosing wardrobe type
+			if (ImGui::Checkbox("Szafka gorna", &b))								// Choosing wardrobe type
 			{	
-				if (wardrobe_model_drawer || wardrobe_model_cargo)wardrobe_type_top = false;
-				wardrobe_type_bottom = false;
-				wardrobe_type_unusual = false;
+				
+				wardrobe.SetWardrobeType(2);
 
 			};
 			ImGui::SameLine();
-			if (ImGui::Checkbox("Niestandardowa", &wardrobe_type_unusual))
+			if (ImGui::Checkbox("Niestandardowa", &c))
 			{
-				wardrobe_type_top = false;
-				wardrobe_type_bottom = false;
+				wardrobe.SetWardrobeType(3);
 			};
-			if (wardrobe_type_bottom || wardrobe_type_top || wardrobe_type_unusual)wardrobe_type_choosed = true;
+
+			
 			ImGui::Text("=================================");
 			ImGui::Text("Wpisz wymiary szafki :");
-			
+			float d = wardrobe.GetBaseSettings(1), e = wardrobe.GetBaseSettings(2), f = wardrobe.GetBaseSettings(3);
 			ImGui::Text("Wpisz szerokosc :");
 			ImGui::SameLine();
-			ImGui::InputFloat("##Width", &base_x, 0, 0);
+			ImGui::InputFloat("##Width", &d, 0, 0);
+			wardrobe.SetSize(1, d);
 			ImGui::Text("Wpisz wysokosc :");
 			ImGui::SameLine();
-			ImGui::InputFloat("##Lenght", &base_y, 0, 0);  // Wardrobe size inputs
-			
+			ImGui::InputFloat("##Lenght", &e, 0, 0);  // Wardrobe size inputs
+			wardrobe.SetSize(2, e);
 			ImGui::Text("Wpisz glebokosc :");
 			ImGui::SameLine();
-			ImGui::InputFloat("##Height", &base_z, 0, 0);
+			ImGui::InputFloat("##Height", &f, 0, 0);
+			wardrobe.SetSize(3, f);
 			
-			if (base_x != 0 && base_y != 0 && base_z != 0)wardrobe_size_placed = true;
+			//if (wardrobe.GetBaseSettings(1) != 0 && wardrobe.GetBaseSettings(2) != 0 && wardrobe.GetBaseSettings(3) != 0)wardrobe.SetWardrobeType(5);
 			ImGui::Text("=================================");
-
-			if (ImGui::Checkbox("Polka", &wardrobe_model_shelf)) // Shelf Checkbox
+			bool g = wardrobe.GetWardrobeModel(1), h = wardrobe.GetWardrobeModel(2), j = wardrobe.GetWardrobeModel(3), k = wardrobe.GetWardrobeModel(4);
+			if (ImGui::Checkbox("Polka", &g)) // Shelf Checkbox
 			{
-				wardrobe_model_drawer = false;
-				wardrobe_model_corner = false;
-				wardrobe_model_cargo = false;
+				wardrobe.SetWardrobeModel(1);
+				wardrobe.SetDrawers(0, 0);
 			};
 			ImGui::SameLine();
-			if (ImGui::Checkbox("Szuflada", &wardrobe_model_drawer)) // Drawer Checkbox
+			if (ImGui::Checkbox("Szuflada", &h)) // Drawer Checkbox
 			{
-				wardrobe_model_shelf = false;
-				wardrobe_model_corner = false;
-				wardrobe_model_cargo = false;
-				if (wardrobe_type_top)
+				wardrobe.SetWardrobeModel(2);
+				if (wardrobe.GetWardrobeType(2))
 				{
-					wardrobe_type_top = false;
+					wardrobe.SetWardrobeType(1);
+				}
+				//wardrobe.SetShelfs(0, 0);
+			};
+			ImGui::SameLine();
+			if (ImGui::Checkbox("Szafka narozna", &k)) // Corner Checkbox
+			{
+				wardrobe.SetWardrobeModel(3);
+			};
+			ImGui::SameLine();
+			if (ImGui::Checkbox("Cargo", &j)) // Cargo Checkbox
+			{
+				wardrobe.SetWardrobeModel(4);
+
+				if (wardrobe.GetWardrobeType(2))
+				{
+					wardrobe.SetWardrobeType(1);
 				}
 			};
-			ImGui::SameLine();
-			if (ImGui::Checkbox("Szafka narozna", &wardrobe_model_corner)) // Corner Checkbox
-			{
-				wardrobe_model_drawer = false;
-				wardrobe_model_shelf = false;
-				wardrobe_model_cargo = false;
-			};
-			ImGui::SameLine();
-			if (ImGui::Checkbox("Cargo", &wardrobe_model_cargo)) // Cargo Checkbox
-			{
-				wardrobe_model_drawer = false;
-				wardrobe_model_corner = false;
-				wardrobe_model_shelf = false;
-
-				if (wardrobe_type_top)
-				{
-					wardrobe_type_top = false;
-				}
-			};
-			if (wardrobe_model_shelf || wardrobe_model_drawer || wardrobe_model_corner || wardrobe_model_cargo)wardrobe_model_choosed = true;
-
-			if (wardrobe_model_shelf)
-			{
-				ImGui::Text("=================================");
-				ImGui::InputInt("##shelf_number", &shelf_number , 1, 10); // Number of shelfs
 			
-				ImGui::Checkbox("Podzielic automatycznie?", &auto_shelf_ratio); // Automatic shelf height ratio
-
-				if (!auto_shelf_ratio)
+			
+			if (wardrobe.GetWardrobeModel(1))
+			{
+				int shelf_number = wardrobe.GetAmount(2);
+				float* shelf_ratio = wardrobe.shelf_ratio;
+				bool ratio = wardrobe.GetAutoRatio(1);
+				ImGui::Text("=================================");
+				ImGui::InputInt("##shelf_number", &shelf_number , 1, 10);
+				if (shelf_number > 4) { ImGui::Text("Mozesz miec tylko 4 polki!"); }// Number of shelfs
+				
+			
+				ImGui::Checkbox("Podzielic automatycznie?", &ratio); // Automatic shelf height ratio
+				
+				if (!ratio)
 				{
-						ImGui::Text("Wpisz wysokosc polki");
-						ImGui::InputInt4("##shelf_number_ratio", &shelf_ration[0], 0); // Height of shelfs
-						ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Jesli ilosc polek mniejsza niz 4 - nie zmieniac wartosci okna");
+					wardrobe.SetAutoRatio(1);
+					ImGui::Text("Wpisz wysokosc polki");
+					ImGui::InputFloat4("##shelf_number_ratio", &shelf_ratio[0], 0); // Height of shelfs
+					ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Jesli ilosc polek mniejsza niz 4 - nie zmieniac wartosci okna");
+					wardrobe.SetShelfs(shelf_number, shelf_ratio);
 				}
+				else
+				{
+					wardrobe.SetAutoRatio(4);
+					wardrobe.SetShelfs(shelf_number, shelf_ratio);
+				}
+				
 			}
 
-			if (wardrobe_model_drawer)
+			if (wardrobe.GetWardrobeModel(2))
 			{
+				int drawer_number = wardrobe.GetAmount(1);
+				float drawer_ratio[4]{ 0,0,0,0 };
+				bool ratio = wardrobe.GetAutoRatio(2);
 				ImGui::Text("=================================");
 				ImGui::InputInt("##drawer_number", &drawer_number, 1, 10); // Number of drawers
 
-				ImGui::Checkbox("Podzielic automatycznie?", &auto_drawer_ratio); // Automatic drawer height ratio
+				ImGui::Checkbox("Podzielic automatycznie?", &ratio);// Automatic drawer height ratio
+				
 
-				if (!auto_drawer_ratio)
+				if (!ratio)
 				{
+					wardrobe.SetAutoRatio(2);
 					ImGui::Text("Wpisz wysokosc szuflady");
-					ImGui::InputInt4("##drawer_number_ratio", &drawer_ratio[0], 0); // Height of drawers
+					ImGui::InputFloat4("##drawer_number_ratio", &drawer_ratio[0], 0); // Height of drawers
 					ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Jesli ilosc szuflad mniejsza niz 4 - nie zmieniac wartosci okna");
 				}
+				else wardrobe.SetAutoRatio(4);
+				wardrobe.SetDrawers(drawer_number, drawer_ratio);
 			}
 
-			if (wardrobe_model_corner)
+			if (wardrobe.GetWardrobeModel(4))
 			{
 				ImGui::Text("=================================");
-				if(ImGui::Checkbox("Polka naroznik", &wardrobe_corner_shelf))wardrobe_corner_lemans = false; // Corner wardrobe type
-				if (!wardrobe_type_top) { if (ImGui::Checkbox("Lemans", &wardrobe_corner_lemans)) wardrobe_corner_shelf = false; }; 
+				bool cor = wardrobe.GetWardrobeTypeCorner(2), cor2 = wardrobe.GetWardrobeTypeCorner(1);
+				if (ImGui::Checkbox("Polka naroznik", &cor))
+				{
+					wardrobe.SetWardrobeTypeCorner(2);
+					wardrobe.SetShelfs(1, 0);
+				}; // Corner wardrobe type
+				if (!b) { if (ImGui::Checkbox("Lemans", &cor2)) wardrobe.SetWardrobeTypeCorner(1); }; 
 
 			}
 			
 			ImGui::Text("=================================");
-			if (wardrobe_type_choosed && wardrobe_model_choosed && wardrobe_size_placed) // Confirm button
+			if (wardrobe.AreOptionsPicked()) // Confirm button
 			{
 				if (ImGui::Button("Potwierdz dane i wygeneruj podglad"))
 				{
-					opengl_presentation_mode = true;
+					settings.SetMode(3);
 				};
 			};
 
@@ -302,36 +279,63 @@ int main()
 
 		};
 
-		if (opengl_presentation_mode && showWindow2)
+		if (settings.GetMode(3) && settings.GetWindow(2))
 		{
+			bool x = true, i = true;
 			//ImGui window manage
-			ImGui::SetNextWindowCollapsed(project_mode);
+			ImGui::SetNextWindowCollapsed(x);
+			if (!x)settings.SetMode(1);
 			ImGui::Begin("Tryb Projektowy");
 			ImGui::End();
+
+			VAO1.Bind();
 			projectTexture.Bind();
 			VBO1.Bind();
-			VAO1.Bind();
 			EBO1.Bind();
-			Converter c1;
-			c1.Calculate(base_x, base_y, base_z, shelf_number, drawer_number);
-			s1.DrawStructure(base_x, base_y, base_z, s1.GetMaxVertexCount(), shelf_number);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, s1.Vertices.size()*(sizeof(Structure::Vertex)), s1.Vertices.data());
-			glDrawElements(GL_TRIANGLES, 1000, GL_UNSIGNED_INT, 0);
 		
+			if (c1.Checkchanges(wardrobe) || wardrobe.CheckRatioChanges())
+				//Doing math to create elements
+			{
+				c1.Calculate(wardrobe);
+				s1.UpdateStructure(c1);
+
+				EBO1.EBOUpdate(s1.GetCuboidIndices(), s1.GetMaxIndexCount());
+				VBO1.VBOUpdate(s1.GetMaxVertexCount());
+
+				VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Position));
+				VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Color));
+				VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Texture));
+				projectTexture.texUnit(shaderProgram, "tex0", 0);
+
+				GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
+				glClear(GL_COLOR_BUFFER_BIT); // Clearing Buffer
+
+				
+				s1.DrawStructure(c1, wardrobe);
+			}
+
+
+			
+		
+			glBufferSubData(GL_ARRAY_BUFFER, 0, s1.Vertices.size()*(sizeof(Structure::Vertex)), s1.Vertices.data());
+			glDrawElements(GL_TRIANGLES, s1.GetMaxIndexCount(), GL_UNSIGNED_INT, 0);
 			ImGui::SetNextWindowPos(ImVec2(1000, 700));
 			
-			ImGui::Begin("Podglad 3D", &showWindow2, ImGuiWindowFlags_NoSavedSettings); //3D Projection Mode
-			
+			ImGui::Begin("Podglad 3D", &i, ImGuiWindowFlags_NoSavedSettings); //3D Projection Mode
+			if (!i)settings.SetWindow(2);
 			if (ImGui::Button("Zakoncz tryb projektowy"))
 			{
-				opengl_presentation_mode = false;
-				showWindow2 = false;
+				settings.SetMode(3);
+				settings.SetWindow(2);
 				ImGui::SetNextWindowCollapsed(false);
 				ImGui::Begin("Tryb Projektowy");
 				ImGui::End();
 				projectTexture.Unbind();
 				VAO1.Unbind();
-				s1.ClearVector();
+				VBO1.Unbind();
+				EBO1.Unbind();
+
+
 			};
 			if (!io.WantCaptureMouse) // Handles Camera input based on cursor position
 			{
@@ -342,35 +346,30 @@ int main()
 
 		};
 
-		//[Validation] Close window repairs
-		{ 
-			if (project_mode == true && showWindow == false)
-			{
-				showWindow = true;
-				project_mode = false;
-			}
-			if (opengl_presentation_mode == true && showWindow2 == false)
-			{
-				showWindow2 = true;
-				opengl_presentation_mode = false;
-			};
-		}
+
+		settings.RepairWindow();
+
 		
 
-
 		//[Sector] Calculator_Mode 
-		if (calc_mode == true && showWindow == true)
+		if (settings.GetMode(2) && settings.GetWindow(1))
 		{
-			ImGui::Begin("Tryb Kalkulatora", &showWindow, ImGuiWindowFlags_NoSavedSettings);
+			bool x = true;
+			ImGui::Begin("Tryb Kalkulatora", &x, ImGuiWindowFlags_NoSavedSettings);
 
+			if (!x)
+			{
+				settings.SetWindow(1);
+				x = !x;
+			}
 			ImGui::Text("Funkcjonalnosc nieprzewidziana w tej wersji programu (DEMO)");
 			ImGui::End();
 
 		};
-		if (calc_mode == true && showWindow == false)
+		if (settings.GetMode(2) && !settings.GetWindow(1))
 		{
-			showWindow = true;
-			calc_mode = false;
+			settings.SetWindow(1);
+			settings.SetMode(2);
 		}
 
 		ImGui::Render();
@@ -378,15 +377,15 @@ int main()
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-		if (exit == true) 
+		if (settings.GetMode(4)) 
 		{
-			glfwDestroyWindow(window);
 			VAO1.Delete();
 			VBO1.Delete();
 			EBO1.Delete();
 			projectTexture.Delete();
 			shaderProgram.Delete();
 			s1.~Structure();
+			glfwDestroyWindow(window);
 			return 0;
 		}; //Exit Button
 	}

@@ -9,8 +9,9 @@ class VBO
 public:
 
 	GLuint ID;
-	VBO(size_t MaxVertexCount);
+	VBO();
 
+	void VBOUpdate(size_t MaxVertexCount);
 	void Bind();
 	void Unbind();
 	void Delete();

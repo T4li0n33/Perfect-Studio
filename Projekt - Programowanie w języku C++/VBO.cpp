@@ -7,9 +7,14 @@ struct Vertex
 	float Texture[2];
 };
 
-VBO::VBO(size_t MaxVertexCount) // Function that creates a Vertex Buffer Object, based on declared size
+VBO::VBO() // Function that creates a Vertex Buffer Object, based on declared size
 {
 	glGenBuffers(1, &ID);
+
+}
+
+void VBO::VBOUpdate(size_t MaxVertexCount)
+{
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
 	glBufferData(GL_ARRAY_BUFFER, MaxVertexCount * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
 }
