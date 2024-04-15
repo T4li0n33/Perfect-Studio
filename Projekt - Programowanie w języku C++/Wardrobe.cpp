@@ -22,6 +22,7 @@ bool Wardrobe::GetWardrobeType(int i) // Returns boolean based od i-value /1=bot
         break;
     }
     default:
+        return -1;
         break;
     };
 }
@@ -42,6 +43,7 @@ bool Wardrobe::GetWardrobeTypeCorner(int i) // Returns boolean based od i-value 
         break;
     }
     default:
+        return -1;
         break;
     };
 }
@@ -70,11 +72,12 @@ bool Wardrobe::GetWardrobeModel(int i) // Returns boolean based od i-value /1=mo
         return wardrobe_model_corner;
     }
     default:
+        return -1;
         break;
     };
 }
 
-bool Wardrobe::GetAutoRatio(int i) //Returns boolean based on i-value where /1=shelf_ratio/2=drawer_ratio
+bool Wardrobe::GetAutoRatio(int i)//Returns boolean based on i-value where /1=shelf_ratio/2=drawer_ratio/3=front_ratio
 {
 
     switch (i)
@@ -88,9 +91,38 @@ bool Wardrobe::GetAutoRatio(int i) //Returns boolean based on i-value where /1=s
     {
         return auto_drawer_ratio;
     }
+
+    case 3:
+    {
+        return auto_front_ratio;
+    }
     default:
         break;
     }
+}
+
+bool Wardrobe::GetFrontBool(int i)
+{
+    switch (i)
+    {
+        case 1:
+        {
+            return with_front;
+        }
+
+        case 2:
+        {
+            return front_bool;
+        }
+
+        default:
+        {
+            return -1;
+            break;
+        }
+
+    }
+    
 }
 
 float Wardrobe::GetShelfRatio()
@@ -116,7 +148,7 @@ float Wardrobe::GetDrawerRatio()
     {
         if (drawer_ratio[i] == 0)
         {
-            drawer_ratio[i] = base_y / shelf_number + 1;
+            drawer_ratio[i] = base_y / drawer_number + 1;
             return drawer_ratio[i];
         }
 
@@ -140,6 +172,12 @@ int Wardrobe::GetAmount(int i)
     case 2:
     {
         return shelf_number;
+        break;
+    }
+
+    case 3:
+    {
+        return fronts_amount;
         break;
     }
     default:
@@ -186,6 +224,17 @@ float Wardrobe::GetBaseSettings(int i)
         break;
     }
 }
+
+float Wardrobe::GetDiaphragmSize()
+{
+    return diaphragm_size;
+}
+
+float Wardrobe::GetBlindSize()
+{
+    return blind_side_size;
+}
+
 
 void Wardrobe::SetSize(int i, float value)
 {
@@ -283,7 +332,7 @@ void Wardrobe::SetWardrobeModel(int i)
     {
     case 1:
     {
-        wardrobe_model_shelf = true;
+        wardrobe_model_shelf = !wardrobe_model_shelf;
         wardrobe_model_drawer = false;
         wardrobe_model_corner = false;
         wardrobe_model_cargo = false;
@@ -293,7 +342,7 @@ void Wardrobe::SetWardrobeModel(int i)
     case 2:
     {
         wardrobe_model_shelf = false;
-        wardrobe_model_drawer = true;
+        wardrobe_model_drawer = !wardrobe_model_drawer;
         wardrobe_model_corner = false;
         wardrobe_model_cargo = false;
         break;
@@ -303,7 +352,7 @@ void Wardrobe::SetWardrobeModel(int i)
     {
         wardrobe_model_shelf = false;
         wardrobe_model_drawer = false;
-        wardrobe_model_corner = true;
+        wardrobe_model_corner = !wardrobe_model_corner;
         wardrobe_model_cargo = false;
         break;
     }
@@ -312,7 +361,7 @@ void Wardrobe::SetWardrobeModel(int i)
         wardrobe_model_shelf = false;
         wardrobe_model_drawer = false;
         wardrobe_model_corner = false;
-        wardrobe_model_cargo = true;
+        wardrobe_model_cargo = !wardrobe_model_cargo;
         break;
     }
     default:
@@ -336,16 +385,64 @@ void Wardrobe::SetAutoRatio(int i)
         break;
     }
     case 3:
-        auto_shelf_ratio = true;
+        auto_drawer_ratio = true;
         break;
 
     case 4:
         auto_shelf_ratio = true;
         break;
+
+    case 5 :
+    {
+        auto_front_ratio = false;
+        break;
+    }
+
+    case 6 :
+    {
+        auto_front_ratio = true;
+        break;
+    }
+
     default:
         break;
     }
   
+}
+
+void Wardrobe::SetFrontBool(int i)
+{
+    switch (i)
+    {
+    case 1:
+    {
+        with_front = false;
+        break;
+    }
+
+    case 2:
+    {
+        with_front = true;
+        break;
+    }
+
+
+    //case 3:
+    //{
+    //    front_bool = false;
+    //    break;
+    //}
+
+    //case 4:
+    //{
+    //    front_bool = true;
+    //    break;
+    //}
+    default:
+    {
+        break;
+    }
+    }
 }
 
 void Wardrobe::SetShelfs(int amount, float* height)
@@ -375,35 +472,88 @@ void Wardrobe::SetShelfs(int amount, float* height)
 
 void Wardrobe::SetDrawers(int amount, float* height)
 {
-    drawer_number = amount;
-
-    if (auto_drawer_ratio)
+    float table[3];
+    for (int x = 0; x < 3; x++)
     {
-        float drawer_height_ratio = (base_y)-(18.0) / (amount + 1);
-        for (int x = 0; x < drawer_number; x++)
-        {
-            drawer_ratio[x] = drawer_height_ratio * x;
+        float first_front = 0.0f;
+        float divider = amount;
+        if (amount == 3 && GetAutoRatio(3)) {
+            table[2] = 143; divider = 2;
+            first_front = 142;
         }
 
+        table[x] = (GetBaseSettings(2) - first_front - 5.00 - 3 * (amount - 1)) / divider;
+        if (amount == 3 && GetAutoRatio(3)) {
+            table[2] = 143; 
+        }
+    }
+    
+
+    drawer_number = amount;
+    float spaces = amount + 1;
+    float drawer_height_ratio = (base_y - 18.0f) / spaces;
+    int i = 0;
+    int k = 33;
+    float result = 0;
+    if (auto_drawer_ratio)
+    {
+        drawer_ratio[0] = 33;
+        for (int x = 1; x < 4; x++)
+        {
+
+            result = result + (table[i] + k);
+            if (result < base_y)
+            {
+                drawer_ratio[x] = result;
+                k = 0;
+            }
+
+            else drawer_ratio[x] = 0;
+            i++;
+        }
     }
     else
     {
-        for (int x = 0; x < drawer_number; x++)
+        for (int x = 0; x < 4; x++)
             drawer_ratio[x] = height[x];
     }
 
 }
 
+void Wardrobe::SetFronts(int amount, float* width)
+
+{
+    fronts_amount = amount;
+    float front_width = (base_x - 6.0f) / amount;
+    if (auto_front_ratio)
+    {
+        for (int x = 0; x < 4; x++)
+        {
+            float result = front_width + (front_width * x);
+            if (result < base_x - 6.0f)
+                front_ratio[x] = result;
+            else front_ratio[x] = 0;
+        }
+    }
+    else
+    {
+        for (int x = 0; x < 4; x++)
+            front_ratio[x] = width[x];
+    }
+}
+
+
 bool Wardrobe::CheckRatioChanges()
 {
     for (int x = 0; x < 4; x++)
     {
-        if (drawer_ratio[x] != previous_d_ratio[x] || shelf_ratio[x] != previous_s_ratio[x]) //Check if all fields are equal
+        if (drawer_ratio[x] != previous_d_ratio[x] || shelf_ratio[x] != previous_s_ratio[x] || front_ratio[x] != previous_f_ratio[x]) //Check if all fields are equal
         {
             for (int i = 0; i < 4; i++)
             {
                 previous_d_ratio[i] =  drawer_ratio[i]; //If not overwrite previous
                previous_s_ratio[i] = shelf_ratio[i];
+               previous_f_ratio[i] = front_ratio[i];
             }
             return true;
             // Signalize that you've catched an input change

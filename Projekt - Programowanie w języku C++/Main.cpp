@@ -158,15 +158,17 @@ int main()
 			ImGui::InputFloat("##Width", &d, 0, 0);
 			wardrobe.SetSize(1, d);
 			ImGui::Text("Wpisz wysokosc :");
+			if (ImGui::SmallButton("Auto y")) e = 720;
 			ImGui::SameLine();
 			ImGui::InputFloat("##Lenght", &e, 0, 0);  // Wardrobe size inputs
 			wardrobe.SetSize(2, e);
 			ImGui::Text("Wpisz glebokosc :");
+			if (ImGui::SmallButton("Auto z")) f = 510;
 			ImGui::SameLine();
 			ImGui::InputFloat("##Height", &f, 0, 0);
 			wardrobe.SetSize(3, f);
 			
-			//if (wardrobe.GetBaseSettings(1) != 0 && wardrobe.GetBaseSettings(2) != 0 && wardrobe.GetBaseSettings(3) != 0)wardrobe.SetWardrobeType(5);
+		
 			ImGui::Text("=================================");
 			bool g = wardrobe.GetWardrobeModel(1), h = wardrobe.GetWardrobeModel(2), j = wardrobe.GetWardrobeModel(3), k = wardrobe.GetWardrobeModel(4);
 			if (ImGui::Checkbox("Polka", &g)) // Shelf Checkbox
@@ -182,7 +184,7 @@ int main()
 				{
 					wardrobe.SetWardrobeType(1);
 				}
-				//wardrobe.SetShelfs(0, 0);
+				
 			};
 			ImGui::SameLine();
 			if (ImGui::Checkbox("Szafka narozna", &k)) // Corner Checkbox
@@ -203,10 +205,12 @@ int main()
 			
 			if (wardrobe.GetWardrobeModel(1))
 			{
+				wardrobe.SetDrawers(0, 0);
 				int shelf_number = wardrobe.GetAmount(2);
 				float* shelf_ratio = wardrobe.shelf_ratio;
 				bool ratio = wardrobe.GetAutoRatio(1);
 				ImGui::Text("=================================");
+				ImGui::Text("Wpisz ilosc polek:");
 				ImGui::InputInt("##shelf_number", &shelf_number , 1, 10);
 				if (shelf_number > 4) { ImGui::Text("Mozesz miec tylko 4 polki!"); }// Number of shelfs
 				
@@ -231,24 +235,30 @@ int main()
 
 			if (wardrobe.GetWardrobeModel(2))
 			{
+				wardrobe.SetShelfs(0, 0);
 				int drawer_number = wardrobe.GetAmount(1);
-				float drawer_ratio[4]{ 0,0,0,0 };
-				bool ratio = wardrobe.GetAutoRatio(2);
+				float* drawer_ratio = wardrobe.drawer_ratio;
+				bool ratio2 = wardrobe.GetAutoRatio(2);
 				ImGui::Text("=================================");
+				ImGui::Text("Wpisz ilosc szuflad:");
 				ImGui::InputInt("##drawer_number", &drawer_number, 1, 10); // Number of drawers
 
-				ImGui::Checkbox("Podzielic automatycznie?", &ratio);// Automatic drawer height ratio
+				ImGui::Checkbox("Podzielic automatycznie?", &ratio2);// Automatic drawer height ratio
 				
 
-				if (!ratio)
+				if (!ratio2)
 				{
 					wardrobe.SetAutoRatio(2);
 					ImGui::Text("Wpisz wysokosc szuflady");
 					ImGui::InputFloat4("##drawer_number_ratio", &drawer_ratio[0], 0); // Height of drawers
 					ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Jesli ilosc szuflad mniejsza niz 4 - nie zmieniac wartosci okna");
+					wardrobe.SetDrawers(drawer_number, drawer_ratio);
 				}
-				else wardrobe.SetAutoRatio(4);
-				wardrobe.SetDrawers(drawer_number, drawer_ratio);
+				else 
+				{
+					wardrobe.SetAutoRatio(3);
+					wardrobe.SetDrawers(drawer_number, drawer_ratio);
+				}
 			}
 
 			if (wardrobe.GetWardrobeModel(4))
@@ -264,6 +274,46 @@ int main()
 
 			}
 			
+			
+			//[FRONTS INPUT]
+			bool fronts = wardrobe.GetFrontBool(1);
+			bool ratio3 = wardrobe.GetAutoRatio(3);
+			ImGui::Text("=================================");
+			ImGui::Spacing(); ImGui::Spacing();
+			ImGui::Checkbox("Szafka z frontami?", &fronts);
+			if(fronts)
+			{
+				wardrobe.SetFrontBool(2);
+				ImGui::Text("Wpisz ilosc frontow:");
+				int front_number = wardrobe.GetAmount(3);
+				float* front_ratio = wardrobe.front_ratio;
+				
+				ImGui::Text("=================================");
+				ImGui::InputInt("##front_number", &front_number, 1, 10);
+				if (front_number > 4) { ImGui::Text("Mozesz miec tylko 4 fronty!"); }// Number of fronts
+
+
+				ImGui::Checkbox("Podzielic fronty automatycznie?", &ratio3); // Automatic front ratio
+
+				if (!ratio3)
+				{
+					wardrobe.SetAutoRatio(5);
+					ImGui::Text("Wpisz wysokosc frontow");
+					ImGui::InputFloat4("##front_number_ratio", &front_ratio[0], 0); // Height of fronts
+					ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Jesli ilosc frontow mniejsza niz 4 - nie zmieniac wartosci okna");
+					wardrobe.SetFronts(front_number, front_ratio);
+				}
+				else
+				{	
+					wardrobe.SetAutoRatio(6);
+					wardrobe.SetFronts(front_number, front_ratio);
+				}
+			}
+			else
+			{
+				wardrobe.SetFrontBool(1);
+				wardrobe.SetFronts(0, 0);
+			}
 			ImGui::Text("=================================");
 			if (wardrobe.AreOptionsPicked()) // Confirm button
 			{
@@ -272,8 +322,6 @@ int main()
 					settings.SetMode(3);
 				};
 			};
-
-
 
 			ImGui::End();
 

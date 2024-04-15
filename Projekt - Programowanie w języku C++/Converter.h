@@ -12,6 +12,7 @@ private:
 	float previous_z = 0;
 	int previous_shelf = 0;
 	int previous_drawer = 0;
+	bool first_front_bool = true;
 
 public:
 	struct Element
@@ -21,7 +22,7 @@ public:
 		float z = 0;
 		int Elem_ID = 0;
 		std::vector<char> veneer;
-		const char* elem_type = "A"; // B - Bottom, S - Side, C - Crossbars, E - Drawer back, F - Drawer bottom, G - Shelf
+		const char* elem_type = "A"; // B - Bottom, S - Side, C - Crossbars, E - Drawer back, F - Drawer bottom, G - Shelf, L - Front
 		bool alreadydrawn = false;
 	};
 
@@ -37,8 +38,8 @@ public:
 	void Shelfs(float x, float z, int shelf_amount, Element* target);
 	void Bottom(float x, float z, Element* target);
 	void Sides(float y, float z, Element* target);
-	void Drawers(float x, float y, float z, int drawer_number, Element* target);
-
+	void Drawers(float x, float y, float z, int drawer_number, Element* target, Wardrobe wardrobe);
+	void Fronts(float x, float y, float z, Element* target, Wardrobe wardrobe);
 	//[Validatino and Optimalization]
 
 	bool Checkchanges(Wardrobe wardrobe);
@@ -47,6 +48,16 @@ public:
 
 	void AlreadyDrawn(int elem_vector_id);
 
+	//[Used assets methods] - Calculates elements sizes based on manufacturer definitions
+
+	float BlumDrawerHeight(float drawer_height);
+	float BlumDrawerDepth(float drawer_depth);
+
+	//[Helping functions]
+
+	float FrontHeight(Wardrobe wardrobe, int i);
+	float DrawerHeight(Wardrobe wardrobe);
+	float FrontWidth(Wardrobe wardrobe);
 	~Converter();
 };
 

@@ -104,6 +104,8 @@ void Structure::DrawStructure(Converter Con, Wardrobe wardrobe)
 	DrawBottom(Con, vertices);
 	DrawCrossBars(Con, vertices);
 	DrawShelfs(Con, vertices, wardrobe);
+	DrawDrawers(Con, vertices, wardrobe);
+	DrawFronts(Con, vertices, wardrobe);
 	CuboidIndices.shrink_to_fit();
 	delete[] vertices;
 	return;
@@ -287,6 +289,131 @@ void Structure::DrawShelfs(Converter Con, Vertex* target , Wardrobe wardrobe)
 	}
 
 	return;
+}
+
+void Structure::DrawDrawers(Converter Con, Vertex* target, Wardrobe wardrobe)
+{
+	int size = Con.Elements_vector.size();
+	int drawer_num = 0;
+	int back_num = 0;
+	float side_width = 0.00f;
+	float side_height = 0.00f;
+	int next_case = 1;
+	float elem_tickness = 0.16f;
+	float spacing = (123.00 / 2)/100.0f;
+	glm::vec3 transform = vec3(0.0f, 0.0f, 0.0f);
+
+	for (int p = 0; p < size; p++)
+	{
+		if (Con.Elements_vector[p].elem_type == "S")
+		{
+			side_width = Con.Elements_vector[p].x / 100.00f;
+			side_height = Con.Elements_vector[p].y / 100.00f;
+		}
+	}
+
+	for (int z = 0; z < size; z++)
+	{
+		if (Con.Elements_vector[z].elem_type == "F" && !Con.Elements_vector[z].alreadydrawn)
+		{
+			CreateStruct(z, Con, target);
+
+			transform = vec3(spacing, (wardrobe.drawer_ratio[drawer_num]) / 100.00f, 0.0f);
+			drawer_num++;
+
+			for (int x = 0; x < 8; x++)
+			{
+
+				target[x].Position = target[x].Position + transform;
+				Vertices.push_back(target[x]);
+			}
+
+			Con.AlreadyDrawn(z);
+		}
+
+	}
+	for (int a = 0; a < size; a++)
+	{
+		if (Con.Elements_vector[a].elem_type == "E" && !Con.Elements_vector[a].alreadydrawn)
+		{
+			CreateStruct(a, Con, target);
+
+			transform = vec3(spacing + 0.11f, wardrobe.drawer_ratio[back_num] / 100.00f, 0.0f);
+			back_num++;
+
+			for (int k = 0; k < 8; k++)
+			{
+
+				target[k].Position = target[k].Position + transform;
+				Vertices.push_back(target[k]);
+			}
+
+			Con.AlreadyDrawn(a);
+		}
+
+	}
+}
+
+void Structure::DrawFronts(Converter Con, Vertex* target, Wardrobe wardrobe)
+{
+	int size = Con.Elements_vector.size();
+	int table[5] = { 0,0,0,0,0 };
+	int prev[4] = {0,0,0,0};
+	int p = 1;
+	glm::vec3 transform = vec3(0.0f, 0.0f, 0.0f);
+	int drawer_num = 0;
+	for (int x = 0; x < size; x++)
+	{
+		if (Con.Elements_vector[x].elem_type == "L" && !Con.Elements_vector[x].alreadydrawn && (wardrobe.GetWardrobeModel(1) || wardrobe.GetWardrobeModel(4)))
+		{
+			table[p] = Con.Elements_vector[x].x;
+			p++;
+		}
+
+	}
+
+	for (int x = 0; x < size; x++)
+	{
+		if (Con.Elements_vector[x].elem_type == "L" && !Con.Elements_vector[x].alreadydrawn && (wardrobe.GetWardrobeModel(2) || wardrobe.GetWardrobeModel(3)))
+		{
+			table[p] = Con.Elements_vector[x].y;
+			p++;
+		}
+
+	}
+	p = 0;
+	int result = 0;
+	for (int z = 0; z < size; z++)
+	{
+		if (Con.Elements_vector[z].elem_type == "L" && !Con.Elements_vector[z].alreadydrawn)
+		{
+			CreateStruct(z, Con, target);
+			if (wardrobe.GetWardrobeModel(1) || wardrobe.GetWardrobeModel(4))
+			{
+				result = result + table[p];
+				transform = vec3(0.0f + result / 100.00f, 0.0f, wardrobe.GetBaseSettings(3) / 100.0f);
+				p++;
+			}
+
+			else
+			{
+				result = result + table[p];
+				transform = vec3(0.0f, (result + p * 3) / 100.00f, wardrobe.GetBaseSettings(3) / 100.0f);
+				p++;
+			}
+
+
+			for (int x = 0; x < 8; x++)
+			{
+
+				target[x].Position = target[x].Position + transform;
+				Vertices.push_back(target[x]);
+			}
+
+			Con.AlreadyDrawn(z);
+		}
+
+	}
 }
 void Structure::ClearVector() // Clears the Verticies vector (one that is beeing sent to OpenGl vertex buffer)
 {

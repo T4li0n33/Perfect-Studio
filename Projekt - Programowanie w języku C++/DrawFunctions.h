@@ -53,7 +53,8 @@ class Structure
 	void DrawCrossBars(Converter Con, Vertex* target);
 	void DrawSides(Converter Con, Vertex* target);
 	void DrawShelfs(Converter Con, Vertex* target, Wardrobe wardrobe);
-	void DrawDrawers(Converter Con, Vertex* target);
+	void DrawDrawers(Converter Con, Vertex* target, Wardrobe wardrobe);
+	void DrawFronts(Converter Con, Vertex* target, Wardrobe wardrobe);
 
 	//[Geters]
 	size_t GetMaxQuadCount(); //Returns MaxQuad
