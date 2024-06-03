@@ -9,3 +9,7 @@ This application lets you visualize the size, texture, and functionality of proj
 * DirectX 11
 * Latest ImGui version
 * Windows compatible with 3.3 GLU Library
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details
