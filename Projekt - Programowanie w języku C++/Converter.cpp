@@ -4,34 +4,53 @@
 void Converter::Calculate(Wardrobe wardrobe)
 {
 
+		//Clear and shrink vector to prevent allocation errors
 		Elements_vector.clear();
-		Elements_vector.shrink_to_fit(); //Clear and shrink vector to prevent allocation errors
-		previous_x = wardrobe.GetBaseSettings(1);
-		previous_y = wardrobe.GetBaseSettings(2); //Update base x,y,z values
-		previous_z = wardrobe.GetBaseSettings(3);
+		Elements_vector.shrink_to_fit();
 
-		float x = wardrobe.GetBaseSettings(1);
-		float y = wardrobe.GetBaseSettings(2);
-		float z = wardrobe.GetBaseSettings(3);
+		//Updateing previous base x,y,z,amount,color values (Used to monitor a change of inputs)
+		previous_x = wardrobe.GetBaseSettings(1);
+		previous_y = wardrobe.GetBaseSettings(2); 
+		previous_z = wardrobe.GetBaseSettings(3);
+		previous_drawer_color = wardrobe.GetDrawerColor();
+		previous_drawer = wardrobe.GetAmount(1);
+		previous_shelf = wardrobe.GetAmount(2);
+		previous_front = wardrobe.GetAmount(3);
+
+		//Assigning new base values
+		float x = wardrobe.GetBaseSettings('x');
+		float y = wardrobe.GetBaseSettings('y');
+		float z = wardrobe.GetBaseSettings('z');
+
+		// Update amount of shelfs and drawers
 		int drawer_amount = wardrobe.GetAmount(1);
 		int shelf_amount = wardrobe.GetAmount(2);
-		previous_drawer = wardrobe.GetAmount(1);
-		previous_shelf = wardrobe.GetAmount(2); // Update amount of shelfs and drawers
+		int front_amount = wardrobe.GetAmount(3);
+		//Assign veener and textures
+		string veneer = wardrobe.GetVeener();
+		string drawer_veneer = wardrobe.GetDrawerColor(wardrobe.GetDrawerColor());
 		
+		//Reset of Element Index Assigner
 		Elem_Num = 0;
-		Element* Elements = new Element[TotalElements(z, shelf_amount, drawer_amount) + 1 + 3];
-		Bottom(x, z, Elements);
-		Crossbars(z, x, Elements);
-		Shelfs(x, z, shelf_amount, Elements);
-		Drawers(x, y, z, drawer_amount, Elements, wardrobe);
-		Sides(y, z, Elements); // Calculates all needed elements and adds them to Elements_vector
-		Fronts(x, y, z, Elements, wardrobe);
+
+		//Computing the total amount of elements
+		Element* Elements = new Element[TotalElements(z, shelf_amount, drawer_amount, front_amount) + 1 + 3];
+
+		//Convert inputs to element attribiutes and adds them to Elements_vector
+		Bottom(x, z, Elements, veneer);
+		Crossbars(z, x, Elements, veneer);
+		Shelfs(x, z, shelf_amount, Elements, veneer);
+		Drawers(x, y, z, drawer_amount, Elements, wardrobe, drawer_veneer);
+		Sides(y, z, Elements, veneer);
+		Fronts(x, y, z, Elements, wardrobe, veneer);
+
+		//Delete allocated buffer
 		delete []Elements;
 		return;
 		
 }
 
-int Converter::TotalElements(float z, int shelf_amount, int drawer_number)
+int Converter::TotalElements(float z, int shelf_amount, int drawer_number, int front_number)
 {
 
 	int crossbars = 2; // default amount of crossbars
@@ -42,101 +61,152 @@ int Converter::TotalElements(float z, int shelf_amount, int drawer_number)
 	
 	}
 
-	int horizontal_elements = crossbars + 1 + shelf_amount + drawer_number; //  calculates amount of horizontal objects || [crossbars / bottom-element / shelfs / drawers]
+	//Calculates amount of horizontal objects || [crossbars / bottom-element / shelfs / drawers]
+	int horizontal_elements = crossbars + 1 + shelf_amount + drawer_number; 
 	int vertical_elements = 2 + drawer_number; //  calculates amount of vertical objects
-	int total_elements = horizontal_elements + vertical_elements; // sum of vertical and horizontal objects (depth elements not yet generated)
+	int total_elements = horizontal_elements + vertical_elements + front_number; // sum of vertical and horizontal objects (depth elements not yet generated)
 
 	return total_elements;
 }
 
-void Converter::Crossbars(float z, float x, Element* target)
+
+void Converter::Crossbars(float z, float x, Element* target, string veneer)
 {
 	float thickness = 18;
 	float crossbar_z = 100; // crossbar z size
 
 	if (z < 350)
 	{
+		//Assigning values and ID
 		target[Elem_Num].x = x - 36;
 		target[Elem_Num].y = thickness;
 		target[Elem_Num].z = z;
 		target[Elem_Num].Elem_ID = Elem_Num;
 		target[Elem_Num].elem_type = "C";
+
+		//Assigning vaneering
+		ApplyElementVeneer('C', target, veneer);
+
+		//Pushing element to the vector
 		Elements_vector.push_back(target[Elem_Num]);
 		Elem_Num++;
 		return;
 	}
 
-		target[Elem_Num].x = x - 36;
-		target[Elem_Num].y = thickness;
-		target[Elem_Num].z = 100;
-		target[Elem_Num].Elem_ID = Elem_Num;
-		target[Elem_Num].elem_type = "C";
-		Elements_vector.push_back(target[Elem_Num]);
-		Elem_Num++;
+	//Assigning values and ID
+	target[Elem_Num].x = x - 36;
+	target[Elem_Num].y = thickness;
+	target[Elem_Num].z = 100;
+	target[Elem_Num].Elem_ID = Elem_Num;
+	target[Elem_Num].elem_type = "C";
 
-		target[Elem_Num].x = x - 36;
-		target[Elem_Num].y = thickness;
-		target[Elem_Num].z = 100;
-		target[Elem_Num].Elem_ID = Elem_Num;
-		target[Elem_Num].elem_type = "C";
-		Elements_vector.push_back(target[Elem_Num]);
-		Elem_Num++;
-		return;
+	//Assigning vaneering
+	ApplyElementVeneer('C', target, veneer);
+
+	//Pushing element to the vector
+	Elements_vector.push_back(target[Elem_Num]);
+	Elem_Num++;
+
+
+	//Assigning values and ID
+	target[Elem_Num].x = x - 36;
+	target[Elem_Num].y = thickness;
+	target[Elem_Num].z = 100;
+	target[Elem_Num].Elem_ID = Elem_Num;
+	target[Elem_Num].elem_type = "C";
+
+	//Assigning vaneering
+	ApplyElementVeneer('C', target, veneer);
+
+	//Pushing element to the vector
+	Elements_vector.push_back(target[Elem_Num]);
+	Elem_Num++;
+	return;
 }
 
-void Converter::Shelfs(float x, float z, int shelf_amount, Element* target)
+void Converter::Shelfs(float x, float z, int shelf_amount, Element* target, string veneer)
 {
 	float thickness = 18;
 	for (int i = 0; i < shelf_amount; i++)
 	{
+		//Assigning values and ID
 		target[Elem_Num].x = x - 36;
 		target[Elem_Num].y = thickness;
 		target[Elem_Num].z = z - 10;
 		target[Elem_Num].Elem_ID = Elem_Num;
 		target[Elem_Num].elem_type = "G";
+
+		//Assigning vaneering
+		ApplyElementVeneer('G', target, veneer);
+	
+		//Pushing element to the vector
 		Elements_vector.push_back(target[Elem_Num]);
 		Elem_Num++;
 	}
 	return;
 }
 
-void Converter::Bottom(float x, float z, Element* target)
+void Converter::Bottom(float x, float z, Element* target, string veneer)
 {
+	//Assigning values and ID
 	float thickness = 18;
 	target[Elem_Num].x = x;
 	target[Elem_Num].y = thickness;
 	target[Elem_Num].z = z;
 	target[Elem_Num].Elem_ID = Elem_Num;
 	target[Elem_Num].elem_type = "B";
+
+	//Assigning vaneering
+	//target[Elem_Num].veneer.push_back(veneer); //x1 coord veneer
+	//target[Elem_Num].veneer.push_back(""); //x2
+	//target[Elem_Num].veneer.push_back(""); //y1 coord veneer
+	//target[Elem_Num].veneer.push_back(""); //y2
+	ApplyElementVeneer('B', target, veneer);
+
+	//Pushing element to the vector
 	Elements_vector.push_back(target[Elem_Num]);
 	Elem_Num++;
 	return;
+
+	
 }
 
-void Converter::Sides(float y, float z, Element* target)
+void Converter::Sides(float y, float z, Element* target, string veneer)
 {	
 	float thickness = 18;
 
+	//Assigning values and ID
 	target[Elem_Num].x = thickness;
 	target[Elem_Num].y = y - 18.0f;
 	target[Elem_Num].z = z;
 	target[Elem_Num].Elem_ID = Elem_Num;
 	target[Elem_Num].elem_type = "S";
+
+	//Assigning vaneering
+	ApplyElementVeneer('S', target, veneer);
+
+	//Pushing element to the vector
 	Elements_vector.push_back(target[Elem_Num]);
 	Elem_Num++;
 
+	//Assigning values and ID
 	target[Elem_Num].x = thickness;
 	target[Elem_Num].y = y - 18.0f;
 	target[Elem_Num].z = z;
 	target[Elem_Num].Elem_ID = Elem_Num;
 	target[Elem_Num].elem_type = "S";
+
+	//Assigning vaneering
+	ApplyElementVeneer('S', target, veneer);
+
+	//Pushing element to the vector
 	Elements_vector.push_back(target[Elem_Num]);
 	Elem_Num++;
 
 	return;
 }
 
-void Converter::Drawers(float x, float y, float z, int drawer_number, Element* target, Wardrobe wardrobe)
+void Converter::Drawers(float x, float y, float z, int drawer_number, Element* target, Wardrobe wardrobe, string veneer)
 {
 		float thickness = 16.00f;
 		int i = 0;
@@ -144,39 +214,58 @@ void Converter::Drawers(float x, float y, float z, int drawer_number, Element* t
 		if (drawer_number == 3) i = 1;
 		for (;i < drawer_number; i++)
 		{
+			//Assigning values and ID
 			target[Elem_Num].x = x - 123;
-			target[Elem_Num].y = BlumDrawerHeight(DrawerHeight(wardrobe) - 18.0f); // [to change] (height of the drawer)
+			target[Elem_Num].y = BlumDrawerHeight(DrawerHeight(wardrobe) - 18.0f); // (height of the drawer)
 			target[Elem_Num].z = thickness;
 			target[Elem_Num].Elem_ID = Elem_Num;
 			target[Elem_Num].elem_type = "E";
+
+			//Assigning vaneering
+			ApplyElementVeneer('E', target, veneer);
+
+			//Pushing element to the vector
 			Elements_vector.push_back(target[Elem_Num]);
 		
 			Elem_Num++;
 
+			//Assigning values and ID
 			target[Elem_Num].x = x - 101;
 			target[Elem_Num].y = thickness;
 			target[Elem_Num].z = 500 - 24; // [to change] (depth of the drawer)
 			target[Elem_Num].elem_type = "F";
 			target[Elem_Num].Elem_ID = Elem_Num;
+
+			//Pushing element to the vector
 			Elements_vector.push_back(target[Elem_Num]);
+
 			Elem_Num++;
 
 		}
 		if (drawer_number == 3)
 		{
+			//Assigning values and ID
 			target[Elem_Num].x = x - 123;
 			target[Elem_Num].y = BlumDrawerHeight(130); // Depends on drawer model
 			target[Elem_Num].z = thickness; // [to change] (depth of the drawer)
 			target[Elem_Num].Elem_ID = Elem_Num;
 			target[Elem_Num].elem_type = "E";
+
+			//Assigning vaneering
+			ApplyElementVeneer('E', target, veneer);
+
+			//Pushing element to the vector
 			Elements_vector.push_back(target[Elem_Num]);
 			Elem_Num++;
 
+			//Assigning values and ID
 			target[Elem_Num].x = x - 101;
 			target[Elem_Num].y = thickness;
 			target[Elem_Num].z = 500 - 24; // [to change] (depth of the drawer)
 			target[Elem_Num].elem_type = "F";
 			target[Elem_Num].Elem_ID = Elem_Num;
+
+			//Pushing element to the vector
 			Elements_vector.push_back(target[Elem_Num]);
 			Elem_Num++;
 		}
@@ -184,7 +273,7 @@ void Converter::Drawers(float x, float y, float z, int drawer_number, Element* t
 		return;
 }
 
-void Converter::Fronts(float x, float y, float z, Element* target, Wardrobe wardrobe)
+void Converter::Fronts(float x, float y, float z, Element* target, Wardrobe wardrobe, string veneer)
 {
 	float thickness = 18.00f;
 
@@ -192,11 +281,17 @@ void Converter::Fronts(float x, float y, float z, Element* target, Wardrobe ward
 	{
 		for (int i = 0; i < wardrobe.GetAmount(3); i++)
 		{
+			//Assigning values and ID
 			target[Elem_Num].x = x - 6.00f; // In drawers 6mm are substracted
 			target[Elem_Num].y = FrontHeight(wardrobe, i);
 			target[Elem_Num].z = thickness;
 			target[Elem_Num].elem_type = "L";
 			target[Elem_Num].Elem_ID = Elem_Num;
+
+			//Assigning vaneering
+			ApplyElementVeneer('L', target, veneer);
+
+			//Pushing element to the vector
 			Elements_vector.push_back(target[Elem_Num]);
 			Elem_Num++;
 		}
@@ -207,11 +302,17 @@ void Converter::Fronts(float x, float y, float z, Element* target, Wardrobe ward
 	{
 		for (int i = 0; i < wardrobe.GetAmount(3); i++)
 		{
+			//Assigning values and ID
 			target[Elem_Num].x = FrontWidth(wardrobe);
 			target[Elem_Num].y = FrontHeight(wardrobe, i);
 			target[Elem_Num].z = thickness;
 			target[Elem_Num].elem_type = "L";
 			target[Elem_Num].Elem_ID = Elem_Num;
+
+			//Assigning vaneering
+			ApplyElementVeneer('L', target, veneer);
+
+			//Pushing element to the vector
 			Elements_vector.push_back(target[Elem_Num]);
 			Elem_Num++;
 		}
@@ -223,7 +324,7 @@ void Converter::Fronts(float x, float y, float z, Element* target, Wardrobe ward
 bool Converter::Checkchanges(Wardrobe wardrobe)
 {
 	if (wardrobe.GetBaseSettings(1) != previous_x || wardrobe.GetBaseSettings(2) != previous_y || wardrobe.GetBaseSettings(3) != previous_z ||
-		wardrobe.GetAmount(2) != previous_shelf || wardrobe.GetAmount(1) != previous_drawer)
+		wardrobe.GetAmount(2) != previous_shelf || wardrobe.GetAmount(1) != previous_drawer || wardrobe.GetDrawerColor() != previous_drawer_color || wardrobe.GetAmount(3) != previous_front) 
 	{
 		return true;
 	}
@@ -249,6 +350,73 @@ float Converter::BlumDrawerHeight(float drawer_height)
 float Converter::BlumDrawerDepth(float drawer_depth)
 {
 	return 0.0f;
+}
+
+void Converter::ApplyElementVeneer(char element_id, Element* target, string veneer)
+{
+	int value = static_cast<int>(element_id);
+	switch (value)
+	{
+
+		case 66: //Bottom (ID : B)
+		{
+			target[Elem_Num].veneer.push_back(veneer); //x1 coord veneer
+			target[Elem_Num].veneer.push_back(""); //x2
+			target[Elem_Num].veneer.push_back(""); //y1 coord veneer
+			target[Elem_Num].veneer.push_back(""); //y2
+			break;
+		}
+		case 67 : //Crossbar (ID : C)
+		{
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back(""); //x2
+			target[Elem_Num].veneer.push_back(""); //x2
+			break;
+		}
+
+		case 69 : //Drawer back (ID : E)
+		{
+			target[Elem_Num].veneer.push_back("");
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back("");
+			target[Elem_Num].veneer.push_back("");
+			break;
+		}
+		
+		case 71 : //Shelf (ID : G)
+		{
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back("");
+			target[Elem_Num].veneer.push_back("");
+			target[Elem_Num].veneer.push_back("");
+			break;
+		}
+		case 76 : //Front (ID : L)
+		{
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back(veneer);
+			break;
+		}
+
+		case 83: //Side (ID :S)
+		{
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back("");
+			target[Elem_Num].veneer.push_back("");
+			target[Elem_Num].veneer.push_back("");
+			break;
+		}
+
+		default : 
+		{
+		std:_Xruntime_error("Element type not recognized");
+		}
+
+	}
+
 }
 
 float Converter::FrontHeight(Wardrobe wardrobe, int i)

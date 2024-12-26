@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GUI.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Converter.cpp" />
@@ -169,6 +170,7 @@
     <ClCompile Include="Wardrobe.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GUI.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Converter.h" />

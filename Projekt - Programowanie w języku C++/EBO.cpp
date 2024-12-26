@@ -8,7 +8,12 @@ EBO::EBO()
 void EBO::EBOUpdate(std::vector<GLuint> indices, GLsizeiptr size)
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, &indices.front(), GL_STATIC_DRAW);
+	if (indices.empty()) {
+		throw std::runtime_error("Index vector is empty!");
+	}
+	size_t size_b = indices.size() * sizeof(GLuint);
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size_b, &indices.front(), GL_STATIC_DRAW);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 

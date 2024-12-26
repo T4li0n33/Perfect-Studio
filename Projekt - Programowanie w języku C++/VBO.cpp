@@ -5,6 +5,8 @@ struct Vertex
 	float Position[3];
 	float Color[3];
 	float Texture[2];
+	float TexIndex[1];
+
 };
 
 VBO::VBO() // Function that creates a Vertex Buffer Object, based on declared size

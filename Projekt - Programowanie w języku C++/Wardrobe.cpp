@@ -185,6 +185,78 @@ int Wardrobe::GetAmount(int i)
     }
 }
 
+std::string Wardrobe::GetVeener()
+{
+    return veneer;
+}
+
+int Wardrobe::GetDrawerColor()
+{
+    return selected_drawer_color;
+}
+
+int Wardrobe::GetDrawerTexture()
+{
+    int color_id = this->GetDrawerColor();
+
+    switch (color_id)
+    {
+
+    case 0:
+        {
+        return 2; // Returns gray texture id
+        break;
+        }
+
+    case 1:
+    {
+        return 0; // Returns white texture id
+        break;
+    }
+
+    case 2:
+    {
+        return 3; // Returns black texture id
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+std::string Wardrobe::GetDrawerColor(int id)
+{
+    switch (id)
+    {
+         case 1:
+         {
+             std::string drawer_veneer = "szara";
+             return drawer_veneer;
+             break;
+         }
+
+         case 2:
+         {
+             std::string drawer_veneer = "biala";
+             return drawer_veneer;
+             break;
+         }
+
+         case 3:
+         {
+             std::string drawer_veneer = "czarna";
+             return drawer_veneer;
+             break;
+         }
+         default:
+         {
+             std::string drawer_veneer = "szara";
+             return drawer_veneer;
+             break;
+         }
+    }
+}
+
 bool Wardrobe::AreOptionsPicked()
 {
     if (wardrobe_type_bottom || wardrobe_type_top || wardrobe_type_unusual)wardrobe_type_choosed = true;
@@ -201,6 +273,7 @@ bool Wardrobe::AreOptionsPicked()
     }
 }
 
+/// Returns value of x,y,z where /1 - x/ 2 - y / 3 - z/
 float Wardrobe::GetBaseSettings(int i)
 {
     switch (i)
@@ -216,6 +289,31 @@ float Wardrobe::GetBaseSettings(int i)
         break;
     }
     case 3:
+    {
+        return base_z;
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+float Wardrobe::GetBaseSettings(char i)
+{
+    
+    switch (i)
+    {
+    case 120:
+    {
+        return base_x;
+        break;
+    }
+    case 121:
+    {
+        return base_y;
+        break;
+    }
+    case 122:
     {
         return base_z;
         break;
@@ -425,19 +523,6 @@ void Wardrobe::SetFrontBool(int i)
         with_front = true;
         break;
     }
-
-
-    //case 3:
-    //{
-    //    front_bool = false;
-    //    break;
-    //}
-
-    //case 4:
-    //{
-    //    front_bool = true;
-    //    break;
-    //}
     default:
     {
         break;
@@ -540,6 +625,16 @@ void Wardrobe::SetFronts(int amount, float* width)
         for (int x = 0; x < 4; x++)
             front_ratio[x] = width[x];
     }
+}
+
+void Wardrobe::SetDrawerColor(int colour)
+{
+    selected_drawer_color = colour;
+}
+
+void Wardrobe::SetVeenerColor(std::string color)
+{
+    veneer = color;
 }
 
 

@@ -9,11 +9,16 @@ in vec3 color;
 // Inputs the texture coordinates from the Vertex Shader
 in vec2 texCoord;
 
+//Inputs the Texture index
+flat in float v_TexIndex;
+
 // Gets the Texture Unit from the main function
-uniform sampler2D tex0;
+uniform sampler2D u_Textures[3];
 
 
 void main()
 {
-	FragColor = texture(tex0, texCoord);
+	int index = int(v_TexIndex);
+	FragColor = texture(u_Textures[index], texCoord);
+	
 }

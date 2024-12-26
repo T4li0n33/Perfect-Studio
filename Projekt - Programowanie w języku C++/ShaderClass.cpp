@@ -74,6 +74,20 @@ void Shader::Delete()
 	glDeleteProgram(ID);
 }
 
+
+void Shader::texUnitLoader(const char* uniform)
+{
+	// Gets the location of the uniform
+	GLuint texUni = glGetUniformLocation(ID, uniform);
+	// Shader needs to be activated before changing the value of a uniform
+	Activate();
+
+
+	int samp[3] = { 0,1,2 };
+	// Sets the value of the uniform
+	glUniform1iv(texUni, 3, samp);
+}
+
 // Checks if the different Shaders have compiled properly
 void Shader::compileErrors(unsigned int shader, const char* type)
 {

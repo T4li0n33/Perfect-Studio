@@ -1,83 +1,229 @@
 #include "DrawFunctions.h"
 
 using namespace glm;
+constexpr auto vertex_on_one_elem = 24;
+constexpr auto thickness = 18;
+constexpr auto drawer_thickness = 16;
+constexpr auto vertex_on_one_side = vertex_on_one_elem/6;
+constexpr auto front_texture_id = 1;
 
 void Structure::Create_Indicies(int loop_amount)
 {
+
+	// CuboidIndices prepering
 	CuboidIndices.clear();
 	CuboidIndices.shrink_to_fit();
-	GLuint table[] = {0,1,2,2,3,0,4,5,6,6,7,4,1,6,5,5,2,1,7,0,3,3,4,7,3,2,5,5,4,3,7,6,1,1,0,7};
+
 	
-	GLuint* CuboidID = new GLuint[MaxIndexCount+1];
-	for (int cuboid_number = 0; cuboid_number < loop_amount; cuboid_number++)
-	{
-		int next_cuboid_id = 8 * cuboid_number;
-		for (int i = 0; i < 36; i++)
-		{
-			CuboidID[i + cuboid_number * 36] = table[i] + next_cuboid_id;
-			if (i >=36)  throw std::overflow_error("Too much indices was generated");
+	GLuint table[] = {
+		// Bottom side (wierzcho³ki 0, 1, 2, 3)
+		0, 1, 2, 2, 3, 0,
+
+		// Top side (wierzcho³ki 4, 5, 6, 7)
+		4, 5, 6, 6, 7, 4,
+
+		// Front side (wierzcho³ki 8, 9, 10, 11)
+		8, 9, 10, 10, 11, 8,
+
+		// Back side (wierzcho³ki 12, 13, 14, 15)
+		12, 13, 14, 14, 15, 12,
+
+		// Left side (wierzcho³ki 16, 17, 18, 19)
+		16, 17, 18, 18, 19, 16,
+
+		// Right side (wierzcho³ki 20, 21, 22, 23)
+		20, 21, 22, 22, 23, 20
+	};
+
+	
+	int requiredSize = loop_amount * 36; // 36 indicies on one cuboid
+	if (MaxIndexCount + 1 < requiredSize) {
+		throw std::logic_error("MaxIndexCount is too small for the required number of elements.");
+	}
+
+	
+	GLuint* CuboidID = new GLuint[requiredSize];
+
+	// Filling up CuboidID
+	for (int cuboid_number = 0; cuboid_number < loop_amount; cuboid_number++) {
+		int next_cuboid_id = vertex_on_one_elem * cuboid_number; // Shift it by 24 on each iteration
+		for (int i = 0; i < 36; i++) {
+			int index = i + cuboid_number * 36;
+			if (index >= requiredSize) {
+				delete[] CuboidID;
+				throw std::overflow_error("Too many indices generated for CuboidID.");
+			}
+			
+			CuboidID[index] = table[i] + next_cuboid_id;
 		}
 	}
 
-	for (int x = 0 ; x<MaxIndexCount+1; x++)
-	{
+	// Copying to CuboidIndices
+	for (int x = 0; x < requiredSize; x++) {
 		CuboidIndices.push_back(CuboidID[x]);
 	}
+
 	delete[] CuboidID;
 	return;
+
+
 }
 
-void Structure::CreateStruct(int elem_id, Converter Con, Vertex* target)//Creating cuboid based on input values
+void Structure::CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex* target)//Creating cuboid based on input values
 {
 	int i = 0;
-	target[i].Position = { 0.0f, 0.0f,  0.0f }; // 0
+	// Dolna œciana (Bottom face)
+	target[i].Position = { 0.0f, 0.0f, 0.0f };
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 0.0f, 0.0f };
-
+	target[i].TexIndex = TexIndex;
 	i++;
 
-	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / 100.0f , 0.0f }; // 1
-	target[i].Color = { 0.83f, 0.70f, 0.44f };
-	target[i].Texture = { 0.0f, 1.0f };
-	i++;
-
-	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, Con.Elements_vector[elem_id].y / 100.0f, 0.0f }; // 2
-	target[i].Color = { 0.83f, 0.70f, 0.44f };
-	target[i].Texture = { 1.0f, 1.0f };
-	i++;
-
-	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f,  0.0f,  0.0f }; //3
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, 0.0f, 0.0f };
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 1.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
 	i++;
 
-
-
-	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f,  0.0f, Con.Elements_vector[elem_id].z / 100.0f };//4
-	target[i].Color = { 0.83f, 0.70f, 0.44f };
-	target[i].Texture = { 1.0f, 0.0f };
-	i++;
-
-
-
-	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f , Con.Elements_vector[elem_id].y / 100.0f , Con.Elements_vector[elem_id].z / 100.0f };//5
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, 0.0f, Con.Elements_vector[elem_id].z / 100.0f };
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 1.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
 	i++;
 
-
-	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / 100.0f , Con.Elements_vector[elem_id].z / 100.0f };//6
+	target[i].Position = { 0.0f, 0.0f, Con.Elements_vector[elem_id].z / 100.0f };
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 0.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
 	i++;
 
-
-	target[i].Position = { 0.0f,  0.0f, Con.Elements_vector[elem_id].z / 100.0f };//7
+	// Górna œciana (Top face)
+	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / 100.0f, 0.0f };
 	target[i].Color = { 0.83f, 0.70f, 0.44f };
 	target[i].Texture = { 0.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, Con.Elements_vector[elem_id].y / 100.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, Con.Elements_vector[elem_id].y / 100.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / 100.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	// Przednia œciana (Front face)
+	target[i].Position = { 0.0f, 0.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, 0.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, Con.Elements_vector[elem_id].y / 100.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / 100.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	// Tylna œciana (Back face)
+	target[i].Position = { 0.0f, 0.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, 0.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, Con.Elements_vector[elem_id].y / 100.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / 100.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	// Lewa œciana (Left face)
+	target[i].Position = { 0.0f, 0.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / 100.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / 100.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { 0.0f, 0.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	// Prawa œciana (Right face)
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, 0.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, Con.Elements_vector[elem_id].y / 100.0f, 0.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 0.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, Con.Elements_vector[elem_id].y / 100.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 1.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
+	i++;
+
+	target[i].Position = { Con.Elements_vector[elem_id].x / 100.0f, 0.0f, Con.Elements_vector[elem_id].z / 100.0f };
+	target[i].Color = { 0.83f, 0.70f, 0.44f };
+	target[i].Texture = { 0.0f, 1.0f };
+	target[i].TexIndex = TexIndex;
 	i++;
 
 
+	VeneerTexture(Con, 1, elem_id, target);
 	return;
 
 }
@@ -98,7 +244,7 @@ void Structure::DrawStructure(Converter Con, Wardrobe wardrobe)
 	Vertices.clear();
 	Vertices.shrink_to_fit();
 
-	GLuint VertexAmount = 8 * Con.Elements_vector.size();
+	GLuint VertexAmount = vertex_on_one_elem * Con.Elements_vector.size();
 	Vertex* vertices = new Vertex[VertexAmount + 1];
 	DrawSides(Con, vertices);
 	DrawBottom(Con, vertices);
@@ -111,10 +257,106 @@ void Structure::DrawStructure(Converter Con, Wardrobe wardrobe)
 	return;
 }
 
+void Structure::CheckVennerConfig(vector<string> veneer_config)
+{
+	int size = veneer_config.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (veneer_config.at(i) == "")
+		{
+
+		}
+	}
+}
+
 void Structure::UpdateStructure(Converter Con)
 {
 	SetVariables(Con.Elem_Num);
 	Create_Indicies(Con.Elem_Num);
+}
+
+void Structure::VeneerTexture(Converter Con, float veneer_id, int element_id, Vertex *target)
+{
+	//Con.Elements_vector[element_id].veneer
+	int first, second;
+	vector<string> veneer_config = Con.Elements_vector[element_id].veneer;
+	if (Con.Elements_vector[element_id].x > Con.Elements_vector[element_id].y) {
+		first = Con.Elements_vector[element_id].x;
+		second = Con.Elements_vector[element_id].y;
+	}
+	else {
+		first = Con.Elements_vector[element_id].y;
+		second = Con.Elements_vector[element_id].x;
+	}
+
+	if (Con.Elements_vector[element_id].z > first) {
+		second = first;
+		first = Con.Elements_vector[element_id].z;
+	}
+	else if (Con.Elements_vector[element_id].z > second) {
+		second = Con.Elements_vector[element_id].z;
+	}
+
+	
+
+	if ((Con.Elements_vector[element_id].x == thickness) || (Con.Elements_vector[element_id].x == drawer_thickness))
+	{
+		for (int x = 0; x < vertex_on_one_side * 4 ; x++) // Bottom, Top, Front, Back
+		{
+			target[x].TexIndex = veneer_id;
+		}
+	}
+
+	if ((Con.Elements_vector[element_id].y == thickness) || (Con.Elements_vector[element_id].y == drawer_thickness))
+	{
+		for (int x = 8; x < (vertex_on_one_side * 6); x++) // Left, Right, Front, Back
+		{
+			target[x].TexIndex = veneer_id;
+		}
+	}
+
+	//if ((Con.Elements_vector[element_id].z == thickness) || (Con.Elements_vector[element_id].z == drawer_thickness)) // Left, Right, Top, Bottom
+	//{
+	//	for (int x = 0; x < vertex_on_one_side * 6; x++)
+	//	{
+	//		int size = veneer_config.size();
+	//		for (int i = 0; i < size; i++)
+	//		{
+	//			if (veneer_config.at(i) == "")
+	//			{
+	//				if (x < 8 || x > 15) // Indicies of said sides
+	//					target[x].TexIndex = 0;
+	//			}
+	//			else
+	//			{
+	//				if (x < 8 || x > 15)
+	//				target[x].TexIndex = veneer_id;
+	//			}
+	//		}
+	//		
+	//	}
+	//}
+	if ((Con.Elements_vector[element_id].z == thickness) || (Con.Elements_vector[element_id].z == drawer_thickness)) // Left, Right, Top, Bottom
+	{
+		int startIndices[4] = { 0, 4, 16, 20 }; // Indeksy pocz¹tkowe dla kolejnych boków
+	
+		// PrzejdŸ przez ka¿dy z 4 boków
+		for (int i = 0; i < 4; i++)
+		{
+			int startIndex = startIndices[i]; // Pobierz pocz¹tkowy indeks dla boku
+
+			// Wybierz teksturê na podstawie veneer_config
+			float texIndex = 3;
+			if (veneer_config.at(i) == "")
+				 texIndex = 0;
+			
+			// Zastosuj teksturê do 4 wierzcho³ków na aktualnym boku
+			for (int j = 0; j < vertex_on_one_side; j++)
+			{
+				target[startIndex + j].TexIndex = texIndex;
+			}
+		}
+	}
 }
 
 size_t Structure::GetMaxQuadCount()
@@ -140,7 +382,7 @@ std::vector<GLuint> Structure::GetCuboidIndices()
 void Structure::SetVariables(size_t MaxStructures)
 {
 	MaxQuadCount = MaxStructures * 6;
-	MaxIndexCount = MaxQuadCount * 128; // Max Sets of Indices ( Used to draw a triangles )
+	MaxIndexCount = MaxStructures * 36; // Max Sets of Indices ( Used to draw a triangles )
 	MaxVertexCount = MaxQuadCount * 4;
 }
 
@@ -151,9 +393,9 @@ void Structure::DrawBottom(Converter Con, Vertex* target)
 	{
 		if (Con.Elements_vector[z].elem_type == "B")
 		{
-			CreateStruct(z, Con, target);
+			CreateStruct(z, 0, Con, target);
 
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
 				Vertices.push_back(target[x]);
 			}
@@ -174,7 +416,7 @@ void Structure::DrawSides(Converter Con, Vertex* target)
 	{
 		if (Con.Elements_vector[z].elem_type == "S" && !Con.Elements_vector[z].alreadydrawn)
 		{
-			CreateStruct(z, Con, target);
+			CreateStruct(z, 0, Con, target);
 
 			switch (next_case)
 			{
@@ -187,7 +429,7 @@ void Structure::DrawSides(Converter Con, Vertex* target)
 				next_case++;
 			}
 			
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
 	
 				target[x].Position = target[x].Position + transform;
@@ -222,7 +464,7 @@ void Structure::DrawCrossBars(Converter Con, Vertex* target)
 	{
 		if (Con.Elements_vector[z].elem_type == "C" && !Con.Elements_vector[z].alreadydrawn)
 		{
-			CreateStruct(z, Con, target);
+			CreateStruct(z, 0, Con, target);
 
 			switch (next_case)
 			{
@@ -235,7 +477,7 @@ void Structure::DrawCrossBars(Converter Con, Vertex* target)
 				next_case++;
 			}
 
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
 
 				target[x].Position = target[x].Position + transform;
@@ -272,12 +514,12 @@ void Structure::DrawShelfs(Converter Con, Vertex* target , Wardrobe wardrobe)
 	{
 		if (Con.Elements_vector[z].elem_type == "G" && !Con.Elements_vector[z].alreadydrawn)
 		{
-			CreateStruct(z, Con, target);
+			CreateStruct(z, 0, Con, target);
 	
 			transform = vec3(side_width, wardrobe.shelf_ratio[shelf_num]/100.00f, 0.0f);
 			shelf_num++;
 
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
 				
 				target[x].Position = target[x].Position + transform;
@@ -316,12 +558,12 @@ void Structure::DrawDrawers(Converter Con, Vertex* target, Wardrobe wardrobe)
 	{
 		if (Con.Elements_vector[z].elem_type == "F" && !Con.Elements_vector[z].alreadydrawn)
 		{
-			CreateStruct(z, Con, target);
+			CreateStruct(z, wardrobe.GetDrawerTexture(), Con, target); // Get Color ID and shift it by 2 basic textures
 
 			transform = vec3(spacing, (wardrobe.drawer_ratio[drawer_num]) / 100.00f, 0.0f);
 			drawer_num++;
 
-			for (int x = 0; x < 8; x++)
+			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
 
 				target[x].Position = target[x].Position + transform;
@@ -336,12 +578,12 @@ void Structure::DrawDrawers(Converter Con, Vertex* target, Wardrobe wardrobe)
 	{
 		if (Con.Elements_vector[a].elem_type == "E" && !Con.Elements_vector[a].alreadydrawn)
 		{
-			CreateStruct(a, Con, target);
+			CreateStruct(a, wardrobe.GetDrawerTexture(), Con, target);
 
 			transform = vec3(spacing + 0.11f, wardrobe.drawer_ratio[back_num] / 100.00f, 0.0f);
 			back_num++;
 
-			for (int k = 0; k < 8; k++)
+			for (int k = 0; k < vertex_on_one_elem; k++)
 			{
 
 				target[k].Position = target[k].Position + transform;
@@ -356,65 +598,91 @@ void Structure::DrawDrawers(Converter Con, Vertex* target, Wardrobe wardrobe)
 
 void Structure::DrawFronts(Converter Con, Vertex* target, Wardrobe wardrobe)
 {
+	// Get the number of elements in Elements_vector (number of elements to be drawn)
 	int size = Con.Elements_vector.size();
+
+	// Array storing size values of elements for further transformation
 	int table[5] = { 0,0,0,0,0 };
-	int prev[4] = {0,0,0,0};
+
+	// Array for previous results (needed for shifts)
+	int prev[4] = { 0,0,0,0 };
+
+	// Variable to track the current position in the `table` array
 	int p = 1;
+
+	// Transformation vector for element position
 	glm::vec3 transform = vec3(0.0f, 0.0f, 0.0f);
+
+	// Drawer number counter
 	int drawer_num = 0;
+
+	// First loop: find and store `x` sizes of elements of type "L" (Fronts)
+	// if they meet conditions for wardrobe models 1 and 4
 	for (int x = 0; x < size; x++)
 	{
 		if (Con.Elements_vector[x].elem_type == "L" && !Con.Elements_vector[x].alreadydrawn && (wardrobe.GetWardrobeModel(1) || wardrobe.GetWardrobeModel(4)))
 		{
+			// Save the element's `x` value in the table
 			table[p] = Con.Elements_vector[x].x;
 			p++;
 		}
-
 	}
 
+	// Second loop: find and store `y` sizes of elements of type "L" (Fronts)
+	// if they meet conditions for wardrobe models 2 and 3
 	for (int x = 0; x < size; x++)
 	{
 		if (Con.Elements_vector[x].elem_type == "L" && !Con.Elements_vector[x].alreadydrawn && (wardrobe.GetWardrobeModel(2) || wardrobe.GetWardrobeModel(3)))
 		{
+			// Save the element's `y` value in the table
 			table[p] = Con.Elements_vector[x].y;
 			p++;
 		}
-
 	}
+
+	// Reset the pointer to the first index in the table
 	p = 0;
+
+	// Variable holding the sum of shifts for the current transformations
 	int result = 0;
+
+	// Loop processing all elements of type "L" and applying transformations
 	for (int z = 0; z < size; z++)
 	{
 		if (Con.Elements_vector[z].elem_type == "L" && !Con.Elements_vector[z].alreadydrawn)
 		{
-			CreateStruct(z, Con, target);
+			// Call the function to create the structure for the element at index `z`
+			CreateStruct(z, 1, Con, target);
+
+			// Transformation on the `x` axis for models 1 and 4, and on the `y` axis for models 2 and 3
 			if (wardrobe.GetWardrobeModel(1) || wardrobe.GetWardrobeModel(4))
 			{
+				// Calculate the shift on the x-axis based on the `table` array
 				result = result + table[p];
-				transform = vec3(0.0f + result / 100.00f, 0.0f, wardrobe.GetBaseSettings(3) / 100.0f);
+				transform = vec3((result + (p * 3)) / 100.00f, 0.0f, wardrobe.GetBaseSettings(3) / 100.0f);
 				p++;
 			}
-
 			else
 			{
+				// Calculate the shift on the y-axis based on the `table` array
 				result = result + table[p];
-				transform = vec3(0.0f, (result + p * 3) / 100.00f, wardrobe.GetBaseSettings(3) / 100.0f);
+				transform = vec3(0.0f, (result + (p * 3)) / 100.00f, wardrobe.GetBaseSettings(3) / 100.0f);
 				p++;
 			}
 
-
-			for (int x = 0; x < 8; x++)
+			// Shift the position of the element's vertices by the transformation vector
+			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
-
 				target[x].Position = target[x].Position + transform;
 				Vertices.push_back(target[x]);
 			}
 
+			// Mark the element as drawn to avoid reprocessing it
 			Con.AlreadyDrawn(z);
 		}
-
 	}
 }
+
 void Structure::ClearVector() // Clears the Verticies vector (one that is beeing sent to OpenGl vertex buffer)
 {
 	Vertices.clear();

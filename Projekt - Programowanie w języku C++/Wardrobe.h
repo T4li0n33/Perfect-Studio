@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+
+
 class Wardrobe
 {
 	bool wardrobe_type_bottom = false;
@@ -25,8 +28,10 @@ class Wardrobe
 	int drawer_number = 0;
 	int wardrobe_index = 0;
 	int fronts_amount = 0;
+	int selected_drawer_color = 0; //0 = gray, 1 = white, 2 = black
 	float blind_side_size = 0.00f;
 	float diaphragm_size = 0.00f;
+	std::string veneer;
 
 public:
 	
@@ -61,19 +66,29 @@ public:
 	//Returns amount of drawers - 1/shelfs - 2 / 3-fronts
 	int GetAmount(int i);
 
+	//Returns veener color (string)
+	std::string GetVeener();
+
+	//Returns id of selected drawer color
+	
+	int GetDrawerColor();
+
+	int GetDrawerTexture();
+
+	std::string GetDrawerColor(int id);
+
 	//Checks if all needed inputs are placed
 	bool AreOptionsPicked();
-
-	//Returns value of x,y,z where /1 - x/ 2 - y / 3 - z/
+	
+	
 	float GetBaseSettings(int i);
+	float GetBaseSettings(char i);
 
 	//Returns diaphragm size
 	float GetDiaphragmSize();
 
 	//Returns size of blind side in corner wardrobe
 	float GetBlindSize();
-
-	//bool GetFirstFront();
 
 	//[Seters]
 
@@ -103,6 +118,10 @@ public:
 
 	//Sets amount and height of fronts
 	void SetFronts(int amount, float* width);
+
+	void SetDrawerColor(int color);
+
+	void SetVeenerColor(std::string color);
 
 	//void SetFirstFront(bool t);
 	//[Validation and optimalization]

@@ -35,6 +35,7 @@ class Structure
 			glm::vec3 Position;
 			Vec3 Color;
 			Vec2 Texture;
+			float TexIndex;
 		};
 
 
@@ -43,7 +44,7 @@ class Structure
 	std::vector<Vertex> Vertices;
 
 	//[Object Generators]
-	void CreateStruct(int elem_id, Converter Con, Vertex* target); // Creates a single Cuboid based on passed values
+	void CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex* target); // Creates a single Cuboid based on passed values
 	void Create_Indicies(int loop_amount); // Generates Indices (patterns) of triangles that will be made
 	void SetVariables(size_t MaxStructures); // Sets all Structure Class members (such as MaxQuadCount, MaxVertexCount, MaxIndexCount)
 	void DrawStructure(Converter Con, Wardrobe wardrobe); //Static method (used Converter data)
@@ -64,6 +65,8 @@ class Structure
 	//std::vector<Structure::Vertex> GetVertices(); //Returns current Verticies vector
 
 	//[General Methods]
+	void CheckVennerConfig(vector<string> veneer_config);
 	void UpdateStructure(Converter Con);
+	void VeneerTexture(Converter Con, float veneer_id, int element_id, Vertex* target);
 	void ClearVector(); // Clears the Verticies vector (one that is beeing sent to OpenGl vertex buffer)
 };
