@@ -17,7 +17,7 @@ private:
 	int previous_front = 0;
 	int previous_drawer_color = 0;
 	bool first_front_bool = true;
-
+	int wardrobe_type = 0;
 public:
 	struct Element
 	{
@@ -75,7 +75,9 @@ public:
 	float FrontHeight(Wardrobe wardrobe, int i);
 	float DrawerHeight(Wardrobe wardrobe);
 	float FrontWidth(Wardrobe wardrobe);
-
+	void SaveWardrobeType(Wardrobe wardrobe);
+	int GetWardrobeType();
+	
 	//Delete object
 	~Converter();
 };

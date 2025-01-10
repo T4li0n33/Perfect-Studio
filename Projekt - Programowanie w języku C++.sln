@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Projekt - Programowanie w języku C++", "Projekt - Programowanie w języku C++\Projekt - Programowanie w języku C++.vcxproj", "{8819F613-D330-4F87-B85D-2F6010366B6B}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "PerfectSetup", "PerfectSetup\PerfectSetup.vdproj", "{F8FAC6DD-8432-420D-9951-9FCBC8832466}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{8819F613-D330-4F87-B85D-2F6010366B6B}.Release|x64.Build.0 = Release|x64
 		{8819F613-D330-4F87-B85D-2F6010366B6B}.Release|x86.ActiveCfg = Release|Win32
 		{8819F613-D330-4F87-B85D-2F6010366B6B}.Release|x86.Build.0 = Release|Win32
+		{F8FAC6DD-8432-420D-9951-9FCBC8832466}.Debug|x64.ActiveCfg = Debug
+		{F8FAC6DD-8432-420D-9951-9FCBC8832466}.Debug|x86.ActiveCfg = Debug
+		{F8FAC6DD-8432-420D-9951-9FCBC8832466}.Release|x64.ActiveCfg = Release
+		{F8FAC6DD-8432-420D-9951-9FCBC8832466}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

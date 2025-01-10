@@ -608,8 +608,9 @@ void Wardrobe::SetDrawers(int amount, float* height)
 void Wardrobe::SetFronts(int amount, float* width)
 
 {
-    fronts_amount = amount;
-    float front_width = (base_x - 6.0f) / amount;
+    float front_width = 0;
+    //fronts_amount = amount;
+    if(amount) front_width = (base_x - 6.0f) / amount;
     if (auto_front_ratio)
     {
         for (int x = 0; x < 4; x++)

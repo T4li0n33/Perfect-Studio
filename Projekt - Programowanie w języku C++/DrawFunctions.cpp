@@ -389,6 +389,7 @@ void Structure::SetVariables(size_t MaxStructures)
 void Structure::DrawBottom(Converter Con, Vertex* target)
 {
 	int size = Con.Elements_vector.size();
+	glm::vec3 transform = vec3(0.0f, 0.0f, 0.0f);
 	for (int z = 0; z < size; z++)
 	{
 		if (Con.Elements_vector[z].elem_type == "B")
@@ -397,6 +398,8 @@ void Structure::DrawBottom(Converter Con, Vertex* target)
 
 			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
+				if (Con.GetWardrobeType() == 2) transform = vec3((Con.Elements_vector[1].y / 100.00f), 0.0f, 0.0f);
+				target[x].Position = target[x].Position + transform;
 				Vertices.push_back(target[x]);
 			}
 		}
@@ -420,13 +423,18 @@ void Structure::DrawSides(Converter Con, Vertex* target)
 
 			switch (next_case)
 			{
-			case 1 :
+			case 1 : //Transformation for first side panel
+
 				transform = vec3(0.0f, Con.Elements_vector[0].y / 100.0f, 0.0f);
+				if (Con.GetWardrobeType() == 2) transform = vec3(0.0f, 0.0f, 0.0f);
 				next_case++;
 				break;
-			case 2:
+			case 2: // Transformation for second side panel
+				
 				transform = vec3((Con.Elements_vector[0].x / 100.00f) - (Con.Elements_vector[0].y / 100.00f), Con.Elements_vector[0].y / 100.0f, 0.0f);
+				if (Con.GetWardrobeType() == 2) transform = vec3((Con.Elements_vector[0].x / 100.00f + 0.36f) - (Con.Elements_vector[0].y / 100.00f), 0.0f, 0.0f);
 				next_case++;
+				break;
 			}
 			
 			for (int x = 0; x < vertex_on_one_elem; x++)
@@ -470,6 +478,7 @@ void Structure::DrawCrossBars(Converter Con, Vertex* target)
 			{
 			case 1:
 				transform = vec3(side_width, side_height, 0.0f);
+				if(Con.GetWardrobeType() == 2) transform = vec3(side_width, side_height - 0.18f, 0.0f);
 				next_case++;
 				break;
 			case 2:

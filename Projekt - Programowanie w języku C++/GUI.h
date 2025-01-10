@@ -18,7 +18,9 @@
 class GUI
 {
 private:
-	ImGuiStyle& style = ImGui::GetStyle();
+	ImGuiStyle* style = nullptr;
+	ImGuiIO* io;
+	ImFont* boldFont;
 public:
 
 	void INI();
@@ -29,8 +31,11 @@ public:
 	//void ProjectionGUI_End(Settings settings, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture, Camera& camera);
 	void Calc(Settings &settings);
 	//void Exit(Settings settings, VBO vbo, VAO vao, EBO ebo, Shader shader, Texture texture, GLFWwindow& window);
-	void Exit(Settings &settings, VBO &vbo, VAO &vao, EBO &ebo, Shader &shader, Texture &texture, GLFWwindow& window);
+	void Exit(Settings &settings, VBO &vbo, VAO &vao, EBO &ebo, Shader &shader, Texture &texture, GLFWwindow* window);
 	void HoldEvents(GLFWwindow *window);
+	GUI(GLFWwindow *window);
+	ImGuiIO& GetIO() { return *io; }
+	void SetImGuiLocation();
 	void Shutdown();
 };
 

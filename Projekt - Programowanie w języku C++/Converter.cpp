@@ -22,10 +22,12 @@ void Converter::Calculate(Wardrobe wardrobe)
 		float y = wardrobe.GetBaseSettings('y');
 		float z = wardrobe.GetBaseSettings('z');
 
-		// Update amount of shelfs and drawers
+		// Update amount of shelfs, drawers, fronts and wardrobe type
 		int drawer_amount = wardrobe.GetAmount(1);
 		int shelf_amount = wardrobe.GetAmount(2);
 		int front_amount = wardrobe.GetAmount(3);
+		SaveWardrobeType(wardrobe);
+
 		//Assign veener and textures
 		string veneer = wardrobe.GetVeener();
 		string drawer_veneer = wardrobe.GetDrawerColor(wardrobe.GetDrawerColor());
@@ -75,7 +77,7 @@ void Converter::Crossbars(float z, float x, Element* target, string veneer)
 	float thickness = 18;
 	float crossbar_z = 100; // crossbar z size
 
-	if (z < 350)
+	if (z < 350 || GetWardrobeType() == 2) // If size of top is smaller than 350 or it's a cabinet
 	{
 		//Assigning values and ID
 		target[Elem_Num].x = x - 36;
@@ -93,34 +95,24 @@ void Converter::Crossbars(float z, float x, Element* target, string veneer)
 		return;
 	}
 
-	//Assigning values and ID
-	target[Elem_Num].x = x - 36;
-	target[Elem_Num].y = thickness;
-	target[Elem_Num].z = 100;
-	target[Elem_Num].Elem_ID = Elem_Num;
-	target[Elem_Num].elem_type = "C";
+	for (int w = 0; w < 2; w++)
+	{
+		//Assigning values and ID
+		target[Elem_Num].x = x - 36;
+		target[Elem_Num].y = thickness;
+		target[Elem_Num].z = 100;
+		target[Elem_Num].Elem_ID = Elem_Num;
+		target[Elem_Num].elem_type = "C";
 
-	//Assigning vaneering
-	ApplyElementVeneer('C', target, veneer);
+		//Assigning vaneering
+		ApplyElementVeneer('C', target, veneer);
 
-	//Pushing element to the vector
-	Elements_vector.push_back(target[Elem_Num]);
-	Elem_Num++;
+		//Pushing element to the vector
+		Elements_vector.push_back(target[Elem_Num]);
+		Elem_Num++;
+		
 
-
-	//Assigning values and ID
-	target[Elem_Num].x = x - 36;
-	target[Elem_Num].y = thickness;
-	target[Elem_Num].z = 100;
-	target[Elem_Num].Elem_ID = Elem_Num;
-	target[Elem_Num].elem_type = "C";
-
-	//Assigning vaneering
-	ApplyElementVeneer('C', target, veneer);
-
-	//Pushing element to the vector
-	Elements_vector.push_back(target[Elem_Num]);
-	Elem_Num++;
+	}
 	return;
 }
 
@@ -151,6 +143,7 @@ void Converter::Bottom(float x, float z, Element* target, string veneer)
 	//Assigning values and ID
 	float thickness = 18;
 	target[Elem_Num].x = x;
+	if(GetWardrobeType() == 2) target[Elem_Num].x = x - 36;
 	target[Elem_Num].y = thickness;
 	target[Elem_Num].z = z;
 	target[Elem_Num].Elem_ID = Elem_Num;
@@ -175,33 +168,23 @@ void Converter::Sides(float y, float z, Element* target, string veneer)
 {	
 	float thickness = 18;
 
-	//Assigning values and ID
-	target[Elem_Num].x = thickness;
-	target[Elem_Num].y = y - 18.0f;
-	target[Elem_Num].z = z;
-	target[Elem_Num].Elem_ID = Elem_Num;
-	target[Elem_Num].elem_type = "S";
+	for (int w = 0; w < 2; w++)
+	{
+		//Assigning values and ID
+		target[Elem_Num].x = thickness;
+		target[Elem_Num].y = y - 18.0f;
+		if (GetWardrobeType() == 2) target[Elem_Num].y = y; // In cabinets side's height is based on input
+		target[Elem_Num].z = z;
+		target[Elem_Num].Elem_ID = Elem_Num;
+		target[Elem_Num].elem_type = "S";
 
-	//Assigning vaneering
-	ApplyElementVeneer('S', target, veneer);
+		//Assigning vaneering
+		ApplyElementVeneer('S', target, veneer);
 
-	//Pushing element to the vector
-	Elements_vector.push_back(target[Elem_Num]);
-	Elem_Num++;
-
-	//Assigning values and ID
-	target[Elem_Num].x = thickness;
-	target[Elem_Num].y = y - 18.0f;
-	target[Elem_Num].z = z;
-	target[Elem_Num].Elem_ID = Elem_Num;
-	target[Elem_Num].elem_type = "S";
-
-	//Assigning vaneering
-	ApplyElementVeneer('S', target, veneer);
-
-	//Pushing element to the vector
-	Elements_vector.push_back(target[Elem_Num]);
-	Elem_Num++;
+		//Pushing element to the vector
+		Elements_vector.push_back(target[Elem_Num]);
+		Elem_Num++;
+	}
 
 	return;
 }
@@ -496,6 +479,23 @@ float Converter::FrontWidth(Wardrobe wardrobe)
 		float front_width = (wardrobe.GetBaseSettings(1) - 4.00f - 3.00f * (amount - 1)) / amount;
 		return front_width;
 	}
+}
+
+void Converter::SaveWardrobeType(Wardrobe wardrobe)
+{
+	for (int i = 1; i <= 3; ++i)
+	{
+		if (wardrobe.GetWardrobeType(i))
+		{
+			this->wardrobe_type = i;
+			return;
+		}
+	}
+}
+
+int Converter::GetWardrobeType()
+{
+	return wardrobe_type;
 }
 
 Converter::~Converter()

@@ -4,6 +4,8 @@
 
 #include <future>
 #include <iostream>
+#include <stb/stb_image.h>
+#include <Windows.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <gl/GL.h>
@@ -24,10 +26,12 @@
 #include "Wardrobe.h"
 #include "GUI.h"
 
+
 using namespace std;
 
 int main()
 {
+	FreeConsole();
 	Settings settings;
 	Wardrobe wardrobe;
 	Camera camera(settings.WindowWidth(), settings.WindowHeight(), glm::vec3(3.0f, 5.0f, 15.0f));
@@ -46,24 +50,14 @@ int main()
 		cout << "Failed to create a window" << endl;
 		glfwTerminate();
 	}
-
+	
 	glfwMakeContextCurrent(window);
+	GLFWimage images[1];
+	images[0].pixels = stbi_load("icon.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+	glfwSetWindowIcon(window, 1, images);
+	stbi_image_free(images[0].pixels);
 	gladLoadGL();
 	glViewport(0,0, settings.WindowWidth(), settings.WindowHeight()); //Viewport
-
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImFontConfig config;
-
-	io.Fonts->AddFontFromFileTTF("Regular.ttf", 16.0f, NULL);
-	
-	io.Fonts->Build();
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init("#version 330"); // Standard ImGui presets
-	
 	glEnable(GL_DEPTH_TEST);
 	Shader shaderProgram("default.vert", "default.frag");
 
@@ -79,12 +73,9 @@ int main()
 	EBO EBO1;
 	VAO VAO1;
 	VBO VBO1;
-	GUI Ortega_GUI;
+	GUI Ortega_GUI(window);
 	while (!glfwWindowShouldClose(window))
 	{
-
-
-
 
 		glClearColor(34.0f / 255.0f, 43.0f / 255.0f, 52.0f / 255.0f, 0.6f); //Background color 142, 202, 230
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -168,7 +159,8 @@ int main()
 
 
 			};
-			if (!io.WantCaptureMouse) // Handles Camera input based on cursor position
+			
+			if (!Ortega_GUI.GetIO().WantCaptureMouse) // Handles Camera input based on cursor position
 			{
 				camera.Inputs(window);
 				camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
@@ -186,7 +178,7 @@ int main()
 		//s1.~Structure(); // Change it so structure objects will be destroyed too (Now left for temporary reminder)
 		if (window)
 		{
-			Ortega_GUI.Exit(settings, VBO1, VAO1, EBO1, shaderProgram, projectTexture, *window);
+			Ortega_GUI.Exit(settings, VBO1, VAO1, EBO1, shaderProgram, projectTexture, window);
 		}
 		
 		

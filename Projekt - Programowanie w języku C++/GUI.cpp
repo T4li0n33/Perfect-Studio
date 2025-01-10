@@ -44,6 +44,8 @@ void GUI::INI()
 	style.FrameRounding = 4;
 	style.IndentSpacing = 12.0f;
 
+
+
 }
 
 void GUI::Menu(Settings &settings)
@@ -76,6 +78,11 @@ void GUI::Menu(Settings &settings)
 
 void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 {
+
+float top_margins = 20.0f;
+float small_margin = 5.0f;
+ImColor blue(13, 146, 244);
+
 	if (settings.GetMode(1) && settings.GetWindow(1)) // Project_mode options
 	{
 		bool x = true, a = wardrobe.GetWardrobeType(1), b = wardrobe.GetWardrobeType(2), c = wardrobe.GetWardrobeType(3);
@@ -87,9 +94,15 @@ void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 			settings.SetWindow(1);
 			x = !x;
 		}
-		//ImGui::Text("Jest to okno trybu projektowego");
-		if (!wardrobe.GetWardrobeType(1) && !wardrobe.GetWardrobeType(2) && !wardrobe.GetWardrobeType(3)) { ImGui::Text("Wybierz rodzaj szafki"); };
+		
+		if (!wardrobe.GetWardrobeType(1) && !wardrobe.GetWardrobeType(2) && !wardrobe.GetWardrobeType(3)) 
+		{
+			ImGui::PushFont(boldFont);
+			ImGui::TextColored(blue, "Wybierz rodzaj szafki :");
+			ImGui::PopFont();
+		};
 
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);;
 		if (ImGui::Checkbox("Szafka dolna", &a))
 		{
 			wardrobe.SetWardrobeType(1);
@@ -99,6 +112,7 @@ void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 		{
 
 			wardrobe.SetWardrobeType(2);
+			wardrobe.SetWardrobeModel(1);
 
 		};
 		ImGui::SameLine();
@@ -108,39 +122,54 @@ void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 		};
 
 
-		ImGui::Text("=================================");
-		ImGui::Text("Wpisz wymiary szafki :");
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
+		if (!wardrobe.GetBaseSettings(1) || !wardrobe.GetBaseSettings(2) || !wardrobe.GetBaseSettings(3)) 
+		{
+			ImGui::PushFont(boldFont);
+			ImGui::TextColored(blue, "Wpisz wymiary szafki :");
+			ImGui::PopFont();
+		}
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);
+
 		float d = wardrobe.GetBaseSettings(1), e = wardrobe.GetBaseSettings(2), f = wardrobe.GetBaseSettings(3);
 		ImGui::Text("Wpisz szerokosc :");
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);
+		if (ImGui::SmallButton("Auto x")) d = 600;  
 		ImGui::SameLine();
 		ImGui::InputFloat("##Width", &d, 0, 0);
 		wardrobe.SetSize(1, d);
+
 		ImGui::Text("Wpisz wysokosc :");
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);
 		if (ImGui::SmallButton("Auto y")) e = 720;
 		ImGui::SameLine();
 		ImGui::InputFloat("##Lenght", &e, 0, 0);  // Wardrobe size inputs
 		wardrobe.SetSize(2, e);
 		ImGui::Text("Wpisz glebokosc :");
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);
 		if (ImGui::SmallButton("Auto z")) f = 510;
 		ImGui::SameLine();
 		ImGui::InputFloat("##Height", &f, 0, 0);
 		wardrobe.SetSize(3, f);
 
 		std::string st = wardrobe.GetVeener();
-		ImGui::Text("================================="); //Veneer Color
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins); //Veneer Color
 		ImGui::InputText("Kolor okleiny", &st);
 		wardrobe.SetVeenerColor(st);
 
-		ImGui::Text("=================================");
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
 		bool g = wardrobe.GetWardrobeModel(1), h = wardrobe.GetWardrobeModel(2), j = wardrobe.GetWardrobeModel(3), k = wardrobe.GetWardrobeModel(4);
 		if (ImGui::Checkbox("Polka", &g)) // Shelf Checkbox
 		{
 			wardrobe.SetWardrobeModel(1);
 			wardrobe.SetDrawers(0, 0);
 		};
+		
 		ImGui::SameLine();
+		if(!wardrobe.GetWardrobeType(2))
 		if (ImGui::Checkbox("Szuflada", &h)) // Drawer Checkbox
 		{
+			
 			wardrobe.SetWardrobeModel(2);
 
 
@@ -153,37 +182,47 @@ void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 		ImGui::SameLine();
 		if (ImGui::Checkbox("Szafka narozna", &k)) // Corner Checkbox
 		{
-			wardrobe.SetWardrobeModel(3);
+			
+			wardrobe.SetWardrobeModel(3);			
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
+			
 		};
-		ImGui::SameLine();
-		if (ImGui::Checkbox("Cargo", &j)) // Cargo Checkbox
+		
+		
+		if (!wardrobe.GetWardrobeType(2))
 		{
-			wardrobe.SetWardrobeModel(4);
-
-			if (wardrobe.GetWardrobeType(2))
+			ImGui::SameLine();
+			if (ImGui::Checkbox("Cargo", &j)) // Cargo Checkbox
 			{
-				wardrobe.SetWardrobeType(1);
-			}
-		};
+				wardrobe.SetWardrobeModel(4);
 
+				if (wardrobe.GetWardrobeType(2))
+				{
+					wardrobe.SetWardrobeType(1);
+				}
+			};
+		}
+		
 
-		if (wardrobe.GetWardrobeModel(1))
+		if (wardrobe.GetWardrobeModel(1) || wardrobe.GetWardrobeModel(4))
 		{
 			wardrobe.SetDrawers(0, 0);
 			int shelf_number = wardrobe.GetAmount(2);
 			float* shelf_ratio = wardrobe.shelf_ratio;
 			bool ratio = wardrobe.GetAutoRatio(1);
-			ImGui::Text("=================================");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
+
 			ImGui::Text("Wpisz ilosc polek:");
 			ImGui::InputInt("##shelf_number", &shelf_number, 1, 10);
 			if (shelf_number > 4) { ImGui::TextColored(ImVec4(1, 0, 0, 1), "Mozesz miec tylko 4 polki!"); }// Number of shelfs
 
-
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);;
 			ImGui::Checkbox("Podzielic automatycznie?", &ratio); // Automatic shelf height ratio
 
 			if (!ratio)
 			{
 				wardrobe.SetAutoRatio(1);
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);;
 				ImGui::Text("Wpisz wysokosc polki");
 				ImGui::InputFloat4("##shelf_number_ratio", &shelf_ratio[0], 0); // Height of shelfs
 				ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "Jesli ilosc polek mniejsza niz 4 - nie zmieniac wartosci okna");
@@ -207,11 +246,13 @@ void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 			static const char* current_item = colour[selected];
 			ImGuiComboFlags flags = ImGuiComboFlags_NoArrowButton;
 			float w = ImGui::CalcItemWidth();
-			float spacing = style.ItemInnerSpacing.x;
+			ImGuiStyle local_style = ImGui::GetStyle();
+			float spacing = local_style.ItemInnerSpacing.x;
 			float button_sz = ImGui::GetFrameHeight();
 			ImGui::PushItemWidth(w - spacing * 2.0f - button_sz * 2.0f);
 
 			//Chooseing drawer color
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
 			if (ImGui::BeginCombo("Kolor szuflady", current_item, ImGuiComboFlags_NoArrowButton))
 			{
 				for (; n < IM_ARRAYSIZE(colour); n++)
@@ -238,12 +279,13 @@ void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 			int drawer_number = wardrobe.GetAmount(1);
 			float* drawer_ratio = wardrobe.drawer_ratio;
 			bool ratio2 = wardrobe.GetAutoRatio(2);
-			ImGui::Text("=================================");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
 			ImGui::Text("Wpisz ilosc szuflad:");
 			ImGui::InputInt("##drawer_number", &drawer_number, 1, 10); // Number of drawers
 			if (drawer_number > 4) {
 				ImGui::TextColored(ImVec4(1, 0, 0, 1), "Mozesz miec tylko 4 szuflady!");
 			}
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);
 			ImGui::Checkbox("Podzielic automatycznie?", &ratio2);// Automatic drawer height ratio
 
 
@@ -262,34 +304,25 @@ void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 			}
 		}
 
-		if (wardrobe.GetWardrobeModel(4))
-		{
-			ImGui::Text("=================================");
-			bool cor = wardrobe.GetWardrobeTypeCorner(2), cor2 = wardrobe.GetWardrobeTypeCorner(1);
-			if (ImGui::Checkbox("Polka naroznik", &cor))
-			{
-				wardrobe.SetWardrobeTypeCorner(2);
-				wardrobe.SetShelfs(1, 0);
-			}; // Corner wardrobe type
-			if (!b) { if (ImGui::Checkbox("Lemans", &cor2)) wardrobe.SetWardrobeTypeCorner(1); };
-
-		}
+	
 
 
 		//[FRONTS INPUT]
 		bool fronts = wardrobe.GetFrontBool(1);
 		bool ratio3 = wardrobe.GetAutoRatio(3);
-		ImGui::Text("=================================");
-		ImGui::Spacing(); ImGui::Spacing();
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);;
+		//ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Checkbox("Szafka z frontami?", &fronts);
 		if (fronts)
 		{
 			wardrobe.SetFrontBool(2);
+
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);
 			ImGui::Text("Wpisz ilosc frontow:");
 			int front_number = wardrobe.GetAmount(3);
 			float* front_ratio = wardrobe.front_ratio;
 
-			ImGui::Text("=================================");
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);;
 			ImGui::InputInt("##front_number", &front_number, 1, 10);
 			if (front_number > 4) {
 				ImGui::TextColored(ImVec4(1, 0, 0, 1), "Mozesz miec tylko 4 fronty!");
@@ -318,7 +351,7 @@ void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
 			wardrobe.SetFrontBool(1);
 			wardrobe.SetFronts(0, 0);
 		}
-		ImGui::Text("=================================");
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);;
 		if (wardrobe.AreOptionsPicked()) // Confirm button
 		{
 			if (ImGui::Button("Potwierdz dane i wygeneruj podglad"))
@@ -422,21 +455,22 @@ void GUI::Calc(Settings &settings)
 //	}; //Exit Button
 //}
 
-void GUI::Exit(Settings& settings, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture, GLFWwindow &window)
+void GUI::Exit(Settings& settings, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture, GLFWwindow* window)
 {
-
-	if (settings.GetMode(4))
-	{
-		vao.Delete();
-		vbo.Delete();
-		ebo.Delete();
-		texture.Delete();
-		shader.Delete();
-		//s.~Structure();
-		glfwDestroyWindow(&window);
-
-	}; //Exit Button
-
+    if (settings.GetMode(4))
+    {
+        vao.Delete();
+        vbo.Delete();
+        ebo.Delete();
+        texture.Delete();
+        shader.Delete();
+        if (window != nullptr) {
+            glfwSetWindowShouldClose(window, GLFW_FALSE);
+            glfwDestroyWindow(window);
+            window = nullptr; // Ustawienie wskaŸnika na nullptr po zniszczeniu okna
+        }
+        //s.~Structure();
+    } //Exit Button
 }
 
 void GUI::HoldEvents(GLFWwindow* window)
@@ -447,6 +481,31 @@ void GUI::HoldEvents(GLFWwindow* window)
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 
+}
+
+GUI::GUI(GLFWwindow *window)
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	//ImGuiIO& io = ImGui::GetIO(); (void)io;
+	SetImGuiLocation();
+	ImFontConfig config;
+	style = &ImGui::GetStyle();
+	ImGuiIO& localIo = *io;
+	localIo.Fonts->AddFontFromFileTTF("Regular.ttf", 16.0f, NULL);
+	ImFont* boldFont = localIo.Fonts->AddFontFromFileTTF("Bold.ttf", 16.0f, NULL);
+	this->boldFont = boldFont;
+
+	localIo.Fonts->Build();
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330"); // Standard ImGui presets
+
+}
+
+void GUI::SetImGuiLocation()
+{
+	io = &ImGui::GetIO();
 }
 
 void GUI::Shutdown()
