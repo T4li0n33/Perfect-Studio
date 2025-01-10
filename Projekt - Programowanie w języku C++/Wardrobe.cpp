@@ -608,6 +608,8 @@ void Wardrobe::SetDrawers(int amount, float* height)
 void Wardrobe::SetFronts(int amount, float* width)
 
 {
+
+    this->fronts_amount = amount;
     float front_width = 0;
     //fronts_amount = amount;
     if(amount) front_width = (base_x - 6.0f) / amount;

@@ -324,6 +324,7 @@ ImColor blue(13, 146, 244);
 
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);;
 			ImGui::InputInt("##front_number", &front_number, 1, 10);
+			wardrobe.SetFronts(front_number, front_ratio);
 			if (front_number > 4) {
 				ImGui::TextColored(ImVec4(1, 0, 0, 1), "Mozesz miec tylko 4 fronty!");
 			}// Number of fronts
