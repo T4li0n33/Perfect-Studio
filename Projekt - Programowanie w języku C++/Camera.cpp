@@ -115,3 +115,21 @@ void Camera::Inputs(GLFWwindow* window) // Handles key inputs (such as W,A,S,D)
 	}
 }
 
+glm::vec3 Camera::GetRayDirection(double mouseX, double mouseY)
+{
+	// Zamiana wspó³rzêdnych okna na NDC (Normalized Device Coordinates)
+	float x = (2.0f * mouseX) / width - 1.0f;
+	float y = 1.0f - (2.0f * mouseY) / height; // odwrócone Y
+	float z = 1.0f;
+
+	glm::vec3 rayNDC = glm::vec3(x, y, z);
+	glm::vec4 rayClip = glm::vec4(rayNDC.x, rayNDC.y, -1.0, 1.0);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+	glm::vec4 rayEye = glm::inverse(projection) * rayClip;
+	rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0, 0.0);
+
+	glm::mat4 view = glm::lookAt(Position, Position + Orientation, Up);
+	glm::vec3 rayWorld = glm::vec3(glm::inverse(view) * rayEye);
+	return glm::normalize(rayWorld);
+}
+

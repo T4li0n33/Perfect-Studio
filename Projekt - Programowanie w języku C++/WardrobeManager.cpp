@@ -25,3 +25,14 @@ bool WardrobeManager::HasWardrobes() const {
 size_t WardrobeManager::GetWardrobeCount() const {
     return wardrobes.size();
 }
+
+Wardrobe& WardrobeManager::GetWardrobeByIndex(int i)
+{
+    {
+        if (i >= 0 && i < static_cast<int>(wardrobes.size()))
+        {
+            return wardrobes[i];
+        }
+        throw std::out_of_range("Nieprawid³owy indeks struktury!");
+    }
+}

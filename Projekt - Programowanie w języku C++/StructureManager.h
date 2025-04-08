@@ -16,6 +16,12 @@ public:
     void AddNewStructure(Converter& converter, Wardrobe& wardrobe);
     Structure& GetCurrentStructure();
     void UpdateCurrentStructure(Converter& converter, Wardrobe& wardrobe);
+    int GetTotalStructures();
+    void CollectCombinedBufferData(std::vector<Structure::Vertex>& outVertices, std::vector<GLuint>& outIndices);
+    void UpdateStructurePosition(glm::vec3 newposition);
+    void ShowStructureHitBoxes();
+    void HideStructureHitBoxes();
+    Structure& GetStructureByIndex(int i);
 };
 
 #endif

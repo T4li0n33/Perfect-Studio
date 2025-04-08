@@ -120,6 +120,9 @@
     <ClCompile Include="StructureManager.cpp">
       <Filter>Pliki źródłowe\Structure</Filter>
     </ClCompile>
+    <ClCompile Include="SceneSelector.cpp">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="StructureManager.h">
       <Filter>Pliki nagłówkowe\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneSelector.h">
+      <Filter>Pliki nagłówkowe\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

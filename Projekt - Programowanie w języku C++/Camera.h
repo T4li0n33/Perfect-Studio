@@ -37,6 +37,7 @@ public:
 	void Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shader, const char* uniform);
 	// Handles camera inputs
 	void Inputs(GLFWwindow* window);
+	glm::vec3 GetRayDirection(double mouseX, double mouseY);
 
 };
 #endif

@@ -40,6 +40,9 @@ public:
      * @return size_t Liczba szafek
      */
     size_t GetWardrobeCount() const;
+
+    Wardrobe& GetWardrobeByIndex(int i);
+
 };
 
 #endif // WARDROBE_MANAGER_H

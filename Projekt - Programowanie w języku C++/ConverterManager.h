@@ -13,6 +13,7 @@ private:
 public:
     void AddNewConverter();
     Converter& GetCurrentConverter();
+    Converter& GetConverterByIndex(int i);
 };
 
 #endif 

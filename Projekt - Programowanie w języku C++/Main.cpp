@@ -28,17 +28,18 @@
 #include "WardrobeManager.h"
 #include "ConverterManager.h"
 #include "StructureManager.h"
+#include "SceneSelector.h"
 
 using namespace std;
 
 int main()
 {
-    FreeConsole();
+   // FreeConsole();
     Settings settings;
     WardrobeManager manager;
     ConverterManager converterManager;
     StructureManager structureManager;
-
+    
     manager.AddNewWardrobe();
 
     converterManager.AddNewConverter();
@@ -51,7 +52,7 @@ int main()
    
 
     Camera camera(settings.WindowWidth(), settings.WindowHeight(), glm::vec3(3.0f, 5.0f, 15.0f));
-
+    SceneSelector sceneSelector;
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -113,23 +114,38 @@ int main()
             drawerTexture.BindTexUnit(2, drawerTexture.ID);
             shaderProgram.texUnitLoader("u_Textures");
 
+            for (size_t i = 0; i < structureManager.GetTotalStructures(); ++i)
+            {
+                Wardrobe& currentWardrobe = manager.GetWardrobeByIndex(i);
+                Converter& converter = converterManager.GetConverterByIndex(i);
+                Structure& structure = structureManager.GetStructureByIndex(i);
+
+                converter.Calculate(currentWardrobe);
+
+                if (currentWardrobe.CheckRatioChanges())
+                {
+                    structure.UpdateStructure(converter);
+                    structure.DrawStructure(converter, currentWardrobe);
+                    structure.UpdateHitboxData();
+                }
+            }
+
+
             VAO1.Bind();
             VBO1.Bind();
             EBO1.Bind();
+            vector<Structure::Vertex> combinedVertices;
+            vector<GLuint> combinedIndices;
 
-            // Pobieramy aktualn¹ szafkê
             Wardrobe& currentWardrobe = manager.GetCurrentWardrobe();
-            converter = converterManager.GetCurrentConverter();
-            structure = structureManager.GetCurrentStructure();
+          
 
-            converter.Calculate(currentWardrobe);
-            if (currentWardrobe.CheckRatioChanges())
-            {
-                std::cout << "Jestem tutaj";
-                structure.UpdateStructure(converter);
 
-                EBO1.EBOUpdate(structure.GetCuboidIndices(), structure.GetMaxIndexCount());
-                VBO1.VBOUpdate(structure.GetMaxVertexCount());
+                structureManager.CollectCombinedBufferData(combinedVertices, combinedIndices);
+                VBO1.VBOUpdate(combinedVertices.size() * sizeof(Structure::Vertex));
+                glBufferSubData(GL_ARRAY_BUFFER, 0, combinedVertices.size() * sizeof(Structure::Vertex), combinedVertices.data());
+
+                EBO1.EBOUpdate(combinedIndices, combinedIndices.size());
 
                 VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Position));
                 VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, Color));
@@ -137,18 +153,18 @@ int main()
                 VAO1.LinkAttrib(VBO1, 3, 1, GL_FLOAT, sizeof(Structure::Vertex), (void*)offsetof(Structure::Vertex, TexIndex));
 
                 glClear(GL_COLOR_BUFFER_BIT);
-                structure.DrawStructure(converter, currentWardrobe);
-            }
+                
+            
 
             glEnable(GL_POLYGON_OFFSET_FILL);
             glPolygonOffset(0.1f, 0.1f);
-            glBufferSubData(GL_ARRAY_BUFFER, 0,structure.Vertices.size()*(sizeof(Structure::Vertex)), structure.Vertices.data());
-            glDrawElements(GL_TRIANGLES, structure.GetMaxIndexCount(), GL_UNSIGNED_INT, 0);
+
+            glDrawElements(GL_TRIANGLES, combinedIndices.size(), GL_UNSIGNED_INT, 0);
             glDisable(GL_POLYGON_OFFSET_FILL);
 
             ImGui::SetNextWindowPos(ImVec2(1000, 700));
             ImGui::Begin("Podglad 3D", &x, ImGuiWindowFlags_NoSavedSettings);
-
+            
             if (ImGui::Button("Zakoncz tryb projektowy"))
             {
                 settings.SetMode(3);
@@ -163,16 +179,62 @@ int main()
             }
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20.0f);
             if (ImGui::Button("Dodaj kolejna szafke"))
-            {
+            {   
                 manager.AddNewWardrobe();
                 converterManager.AddNewConverter();
                 structureManager.AddNewStructure(converterManager.GetCurrentConverter(), manager.GetCurrentWardrobe()); 
-                settings.SetMode(3);
-                settings.SetWindow(2);
-                ImGui::SetNextWindowCollapsed(false);
-                ImGui::Begin("Tryb Projektowy");
-                ImGui::End();
+                structureManager.ShowStructureHitBoxes();
             }
+
+            static double lastClickTime = 0.0;
+            double currentTime = glfwGetTime();
+
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+            {
+                if (currentTime - lastClickTime < 0.3) // dwuklik w <300ms
+                {
+                    double mouseX, mouseY;
+                    glfwGetCursorPos(window, &mouseX, &mouseY);
+
+                    glm::vec3 rayDir = camera.GetRayDirection(mouseX, mouseY);
+                    glm::vec3 rayOrigin = camera.Position;
+
+                    for (size_t i = 0; i < structureManager.GetTotalStructures(); ++i)
+                    {
+                        Structure& structure = structureManager.GetStructureByIndex(i);
+
+                        
+                        if (sceneSelector.CheckRayHit(rayOrigin, rayDir, structure))
+                        {
+                           
+                            glm::vec3 newPos = sceneSelector.CalculatePlacementOnFace(
+                                structure.HitboxMin,
+                                structure.HitboxMax,
+                                rayDir
+                            );
+
+                            structureManager.UpdateStructurePosition(newPos);
+
+                            bool lokalna = newPos != glm::vec3(0.0f);
+
+                            if (lokalna)
+                            {
+                                structureManager.HideStructureHitBoxes();
+                                settings.SetMode(3);
+                                settings.SetWindow(2);
+                                ImGui::SetNextWindowCollapsed(false);
+                                ImGui::Begin("Tryb Projektowy");
+                                ImGui::End();
+                            }
+                            break;
+                        }
+                    }
+                }
+                lastClickTime = currentTime;
+            }
+
+       
+
             if (!Ortega_GUI.GetIO().WantCaptureMouse)
             {
                 camera.Inputs(window);

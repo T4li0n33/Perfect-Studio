@@ -18,7 +18,8 @@ class Structure
 	size_t MaxVertexCount;
 	size_t MaxIndexCount;
 	std::vector<GLuint> CuboidIndices;
-	
+	glm::vec3 basePosition = glm::vec3(0.0f, 0.0f, 0.0f);
+
 	public:
 
 		struct Vec2
@@ -37,12 +38,16 @@ class Structure
 			Vec3 Color;
 			Vec2 Texture;
 			float TexIndex;
+			const char* Elem_ID;
 		};
 
 
 	Structure(Converter Con, Wardrobe Wardrobe);
 	~Structure();
 	std::vector<Vertex> Vertices;
+
+	std::vector<glm::vec3> HitboxVertices; 
+	glm::vec3 HitboxMin, HitboxMax;
 
 	//[Object Generators]
 	void CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex* target); // Creates a single Cuboid based on passed values
@@ -64,10 +69,19 @@ class Structure
 	size_t GetMaxIndexCount(); //Returns MaxIndex
 	std::vector<GLuint> GetCuboidIndices(); // Returns Cuboid Indicies (used for traingle draw)
 	//std::vector<Structure::Vertex> GetVertices(); //Returns current Verticies vector
+	glm::vec3 GetBasePositon(); //Return position shifted by user selection
+
+	//[Seters]
+	void SetStructureBasePosition(glm::vec3 positon);
 
 	//[General Methods]
 	void CheckVennerConfig(vector<string> veneer_config);
 	void UpdateStructure(Converter Con);
 	void VeneerTexture(Converter Con, float veneer_id, int element_id, Vertex* target);
+
+	//Hitbox related methods
+	void UpdateHitboxData();
+	void ShowHitboxes();
+	void HideHitboxes();
 	void ClearVector(); // Clears the Verticies vector (one that is beeing sent to OpenGl vertex buffer)
 };
