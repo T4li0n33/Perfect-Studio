@@ -1,5 +1,6 @@
 #include "GUI.h"
 #include <GLFW/glfw3.h>
+#include "WardrobeManager.h"
 
 
 void GUI::INI()
@@ -76,12 +77,13 @@ void GUI::Menu(Settings &settings)
 	}ImGui::End();
 }
 
-void GUI::ProjectionGUI(Settings &settings, Wardrobe &wardrobe)
+void GUI::ProjectionGUI(Settings &settings, WardrobeManager& manager)
 {
 
-float top_margins = 20.0f;
-float small_margin = 5.0f;
-ImColor blue(13, 146, 244);
+	Wardrobe& wardrobe = manager.GetCurrentWardrobe();
+	float top_margins = 20.0f;
+	float small_margin = 5.0f;
+	ImColor blue(13, 146, 244);
 
 	if (settings.GetMode(1) && settings.GetWindow(1)) // Project_mode options
 	{
@@ -352,7 +354,8 @@ ImColor blue(13, 146, 244);
 			wardrobe.SetFrontBool(1);
 			wardrobe.SetFronts(0, 0);
 		}
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);;
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
+
 		if (wardrobe.AreOptionsPicked()) // Confirm button
 		{
 			if (ImGui::Button("Potwierdz dane i wygeneruj podglad"))
@@ -371,7 +374,7 @@ void GUI::ProjectionBegin(Settings settings, Wardrobe wardrobe)
 {
 }
 
-void GUI::ProjectionGUI_End(Settings &settings, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture, Camera& camera, ImGuiIO io, GLFWwindow* window, bool i)
+void GUI::ProjectionGUI_End(Settings &settings, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture, Camera& camera, ImGuiIO io, GLFWwindow* window, bool i, WardrobeManager& manager)
 {
 	ImGui::SetNextWindowPos(ImVec2(1000, 700));
 	//bool i;
@@ -391,6 +394,12 @@ void GUI::ProjectionGUI_End(Settings &settings, VBO& vbo, VAO& vao, EBO& ebo, Sh
 
 
 	};
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20.0f);
+	if (ImGui::Button("Dodaj kolejn¹ szafkê"))
+	{
+		manager.AddNewWardrobe();
+		settings.SetMode(1);  // Ponownie przechodzi do trybu projektowego
+	}
 	if (!io.WantCaptureMouse) // Handles Camera input based on cursor position
 	{
 		camera.Inputs(window);

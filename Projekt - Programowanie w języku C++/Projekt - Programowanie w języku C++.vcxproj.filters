@@ -22,11 +22,32 @@
     <Filter Include="Pliki zasobów\Shaders">
       <UniqueIdentifier>{e552e1f8-dbab-434e-b3b8-50e2c85f032d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\Wardrobe">
+      <UniqueIdentifier>{8fdb77f2-cfd0-4d10-aae6-b79eadae0b7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\Wardrobe">
+      <UniqueIdentifier>{dcd5a5d0-27c6-48ac-9235-9a8b492e703b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\Converter">
+      <UniqueIdentifier>{20b63bd0-fb4c-4fca-a12c-a3e6c46e0fdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\Converter">
+      <UniqueIdentifier>{f5ac0bf7-361d-4946-b776-dd3c50c42bd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\OpenGL">
+      <UniqueIdentifier>{155f3152-3e93-49a2-b26e-047aa3f40cff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\OpenGL">
+      <UniqueIdentifier>{24ca4547-86cf-4c68-a940-245ccf97caf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki nagłówkowe\Structure">
+      <UniqueIdentifier>{1c4d0e15-0c5d-4400-98cc-04b6dc1002df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\Structure">
+      <UniqueIdentifier>{f7a35bc8-c189-46ed-abee-5179e5afcccd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
@@ -51,41 +72,53 @@
     <ClCompile Include="Imgui\imgui_widgets.cpp">
       <Filter>Pliki źródłowe\Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderClass.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="VBO.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="EBO.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="VAO.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="stb.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="DrawFunctions.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="Converter.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
     <ClCompile Include="Settings.cpp">
-      <Filter>Pliki źródłowe</Filter>
-    </ClCompile>
-    <ClCompile Include="Wardrobe.cpp">
       <Filter>Pliki źródłowe</Filter>
     </ClCompile>
     <ClCompile Include="GUI.cpp">
       <Filter>Pliki źródłowe</Filter>
+    </ClCompile>
+    <ClCompile Include="Wardrobe.cpp">
+      <Filter>Pliki źródłowe\Wardrobe</Filter>
+    </ClCompile>
+    <ClCompile Include="WardrobeManager.cpp">
+      <Filter>Pliki źródłowe\Wardrobe</Filter>
+    </ClCompile>
+    <ClCompile Include="Converter.cpp">
+      <Filter>Pliki źródłowe\Converter</Filter>
+    </ClCompile>
+    <ClCompile Include="ConverterManager.cpp">
+      <Filter>Pliki źródłowe\Converter</Filter>
+    </ClCompile>
+    <ClCompile Include="VBO.cpp">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="VAO.cpp">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderClass.cpp">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="EBO.cpp">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawFunctions.cpp">
+      <Filter>Pliki źródłowe\Structure</Filter>
+    </ClCompile>
+    <ClCompile Include="stb.cpp">
+      <Filter>Pliki źródłowe\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="StructureManager.cpp">
+      <Filter>Pliki źródłowe\Structure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -116,38 +149,47 @@
     <ClInclude Include="Imgui\imstb_truetype.h">
       <Filter>Pliki nagłówkowe\Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="shaderClass.h">
+    <ClInclude Include="GUI.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="VBO.h">
-      <Filter>Pliki nagłówkowe</Filter>
+    <ClInclude Include="Wardrobe.h">
+      <Filter>Pliki nagłówkowe\Wardrobe</Filter>
     </ClInclude>
-    <ClInclude Include="EBO.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="VAO.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="DrawFunctions.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Pliki nagłówkowe</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Pliki nagłówkowe</Filter>
+    <ClInclude Include="WardrobeManager.h">
+      <Filter>Pliki nagłówkowe\Wardrobe</Filter>
     </ClInclude>
     <ClInclude Include="Converter.h">
-      <Filter>Pliki nagłówkowe</Filter>
+      <Filter>Pliki nagłówkowe\Converter</Filter>
+    </ClInclude>
+    <ClInclude Include="ConverterManager.h">
+      <Filter>Pliki nagłówkowe\Converter</Filter>
+    </ClInclude>
+    <ClInclude Include="VBO.h">
+      <Filter>Pliki nagłówkowe\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="VAO.h">
+      <Filter>Pliki nagłówkowe\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="EBO.h">
+      <Filter>Pliki nagłówkowe\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="shaderClass.h">
+      <Filter>Pliki nagłówkowe\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Pliki nagłówkowe\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Pliki nagłówkowe\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="Settings.h">
       <Filter>Pliki nagłówkowe</Filter>
     </ClInclude>
-    <ClInclude Include="Wardrobe.h">
-      <Filter>Pliki nagłówkowe</Filter>
+    <ClInclude Include="DrawFunctions.h">
+      <Filter>Pliki nagłówkowe\Structure</Filter>
     </ClInclude>
-    <ClInclude Include="GUI.h">
-      <Filter>Pliki nagłówkowe</Filter>
+    <ClInclude Include="StructureManager.h">
+      <Filter>Pliki nagłówkowe\Structure</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

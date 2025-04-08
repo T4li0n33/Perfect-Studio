@@ -11,6 +11,7 @@
 #include "Texture.h"
 #include "shaderClass.h"
 #include "Camera.h"
+#include "WardrobeManager.h"
 
 
 
@@ -25,9 +26,9 @@ public:
 
 	void INI();
 	void Menu(Settings &settings);
-	void ProjectionGUI(Settings& settings, Wardrobe& wardrobe);
+	void ProjectionGUI(Settings& settings, WardrobeManager& manager);
 	void ProjectionBegin(Settings settings, Wardrobe wardrobe);
-	void ProjectionGUI_End(Settings& settings, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture, Camera& camera, ImGuiIO io, GLFWwindow* window, bool i);
+	void ProjectionGUI_End(Settings& settings, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture, Camera& camera, ImGuiIO io, GLFWwindow* window, bool i, WardrobeManager& manager);
 	//void ProjectionGUI_End(Settings settings, VBO& vbo, VAO& vao, EBO& ebo, Shader& shader, Texture& texture, Camera& camera);
 	void Calc(Settings &settings);
 	//void Exit(Settings settings, VBO vbo, VAO vao, EBO ebo, Shader shader, Texture texture, GLFWwindow& window);

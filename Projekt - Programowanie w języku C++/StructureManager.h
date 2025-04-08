@@ -1,0 +1,21 @@
+#ifndef STRUCTURE_MANAGER_H
+#define STRUCTURE_MANAGER_H
+
+#include "DrawFunctions.h"
+#include "Wardrobe.h"
+#include "Converter.h"
+#include <vector>
+#include <stdexcept>
+
+class StructureManager {
+private:
+    std::vector<Structure> structures;
+    size_t currentIndex = 0;
+
+public:
+    void AddNewStructure(Converter& converter, Wardrobe& wardrobe);
+    Structure& GetCurrentStructure();
+    void UpdateCurrentStructure(Converter& converter, Wardrobe& wardrobe);
+};
+
+#endif
