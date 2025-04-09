@@ -7,6 +7,7 @@
 #include <gl/Gl.h>
 #include "Converter.h"
 #include "Wardrobe.h"
+#include "PlacementDirection.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,7 +20,7 @@ class Structure
 	size_t MaxIndexCount;
 	std::vector<GLuint> CuboidIndices;
 	glm::vec3 basePosition = glm::vec3(0.0f, 0.0f, 0.0f);
-
+	PlacementDirection direction;
 	public:
 
 		struct Vec2
@@ -69,7 +70,7 @@ class Structure
 	size_t GetMaxIndexCount(); //Returns MaxIndex
 	std::vector<GLuint> GetCuboidIndices(); // Returns Cuboid Indicies (used for traingle draw)
 	//std::vector<Structure::Vertex> GetVertices(); //Returns current Verticies vector
-	glm::vec3 GetBasePositon(); //Return position shifted by user selection
+	glm::vec3 GetBasePosition(); //Return position shifted by user selection
 
 	//[Seters]
 	void SetStructureBasePosition(glm::vec3 positon);
@@ -78,10 +79,15 @@ class Structure
 	void CheckVennerConfig(vector<string> veneer_config);
 	void UpdateStructure(Converter Con);
 	void VeneerTexture(Converter Con, float veneer_id, int element_id, Vertex* target);
+	void ClearVector(); // Clears the Verticies vector (one that is beeing sent to OpenGl vertex buffer)
 
-	//Hitbox related methods
+	//[Hitbox] Related methods
+	glm::vec3 GetPlacedPosition(const glm::vec3& basePosition, PlacementDirection direction, Wardrobe newWardrobe);
+	glm::vec3 GetWorldPosition(Wardrobe wardrobe) const;
+	PlacementDirection GetPlacementDirection();
+	void SetPlacementDirection(PlacementDirection direction);
 	void UpdateHitboxData();
 	void ShowHitboxes();
 	void HideHitboxes();
-	void ClearVector(); // Clears the Verticies vector (one that is beeing sent to OpenGl vertex buffer)
+	
 };

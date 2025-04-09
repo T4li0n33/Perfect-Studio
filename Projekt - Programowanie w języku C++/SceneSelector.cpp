@@ -83,22 +83,26 @@ bool SceneSelector::IsNewPositionSelected(glm::vec3 position)
 
 glm::vec3 SceneSelector::CalculatePlacementOnFace(const glm::vec3& minBox, const glm::vec3& maxBox, const glm::vec3& rayDir)
 {
-    // Oblicz szerokoœæ (X) i g³êbokoœæ (Z) obiektu
     float width = maxBox.x - minBox.x;
     float depth = maxBox.z - minBox.z;
 
-    // Kierunek raycastu wskazuje, po której stronie obiektu ma byæ nowy element
-    bool placeOnRight = (rayDir.x > 0); // jeœli rayDir.x > 0, stawiamy po prawej
+    // Kierunek promienia okreœla stronê
+    bool placeOnRight = (rayDir.x > 0);
 
-    // Nowa pozycja X zale¿y od kierunku raycastu
-    float newX = placeOnRight ? maxBox.x : minBox.x - width;
+    float offset = width; // u¿ywamy szerokoœci istniej¹cej szafki jako przesuniêcia
 
-    // Zachowujemy Y i Z takie same jak poprzedni obiekt
+    float newX = placeOnRight ? maxBox.x + offset : minBox.x - offset;
+
     return glm::vec3(
         newX,
-        minBox.y - 0.18f,  // lub maxBox.y, jeœli chcesz wyrównaæ do górnej krawêdzi
-        minBox.z    // lub (minBox.z + maxBox.z) / 2.0f, jeœli chcesz wycentrowaæ
+        minBox.y - 0.18f, // wysokoœæ mo¿na wyrównaæ do w³asnych potrzeb
+        (minBox.z + maxBox.z) / 2.0f // centrowanie w osi Z
     );
+}
+
+PlacementDirection SceneSelector::GetPlacementDirection(const glm::vec3& rayDir)
+{
+    return (rayDir.x > 0) ? PlacementDirection::Right : PlacementDirection::Left;
 }
 
 

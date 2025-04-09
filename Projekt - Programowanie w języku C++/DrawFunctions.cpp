@@ -338,6 +338,40 @@ void Structure::VeneerTexture(Converter Con, float veneer_id, int element_id, Ve
 	}
 }
 
+glm::vec3 Structure::GetPlacedPosition(const glm::vec3& basePosition, PlacementDirection direction, Wardrobe newWardrobe)
+{
+	float newWidth = newWardrobe.GetBaseSettings('x');
+
+	float offsetX = (direction == PlacementDirection::Right)
+		? newWidth
+		: -newWidth;
+
+	return glm::vec3((basePosition.x + offsetX)/100.0f,(basePosition.y - thickness) / 100.0f,basePosition.z) / 100.0f;
+}
+
+glm::vec3 Structure::GetWorldPosition(Wardrobe wardrobe) const {
+	float offsetX = (direction == PlacementDirection::Right)
+		? wardrobe.GetBaseSettings('x')/100.0f
+		: -wardrobe.GetBaseSettings('x')/ 100.0f;
+
+	return glm::vec3(
+		basePosition.x + offsetX,
+		basePosition.y - 0.18f,
+		basePosition.z
+	);
+}
+
+
+PlacementDirection Structure::GetPlacementDirection()
+{
+	return direction;
+}
+
+void Structure::SetPlacementDirection(PlacementDirection direction)
+{
+	this->direction = direction;
+}
+
 void Structure::UpdateHitboxData()
 {
 	HitboxVertices.clear();
@@ -410,9 +444,9 @@ std::vector<GLuint> Structure::GetCuboidIndices()
 	return CuboidIndices;
 }
 
-glm::vec3 Structure::GetBasePositon()
+glm::vec3 Structure::GetBasePosition()
 {
-	return glm::vec3();
+	return basePosition;
 }
 
 void Structure::SetStructureBasePosition(glm::vec3 positon)

@@ -10,5 +10,6 @@ public:
 	void GetAABB(const Structure& s, glm::vec3& outMin, glm::vec3& outMax);
 	bool IsNewPositionSelected(glm::vec3 position);
 	glm::vec3 CalculatePlacementOnFace(const glm::vec3& minBox, const glm::vec3& maxBox, const glm::vec3& rayDir);
+	PlacementDirection GetPlacementDirection(const glm::vec3& rayDir);
 };
 

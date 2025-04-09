@@ -4,6 +4,7 @@
 #include "DrawFunctions.h"
 #include "Wardrobe.h"
 #include "Converter.h"
+#include "PlacementDirection.h"
 #include <vector>
 #include <stdexcept>
 

@@ -197,6 +197,9 @@
     <ClInclude Include="SceneSelector.h">
       <Filter>Pliki nagłówkowe\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="PlacementDirection.h">
+      <Filter>Pliki nagłówkowe\Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="default.vert">

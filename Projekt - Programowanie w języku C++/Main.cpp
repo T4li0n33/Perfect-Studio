@@ -126,6 +126,11 @@ int main()
                 {
                     structure.UpdateStructure(converter);
                     structure.DrawStructure(converter, currentWardrobe);
+
+                    //glm::vec3 newPos = structure.GetPlacedPosition(structure.GetBasePosition(), structure.GetPlacementDirection(), manager.GetCurrentWardrobe());
+                    glm::vec3 newPos = structure.GetWorldPosition(currentWardrobe);
+                    structureManager.UpdateStructurePosition(newPos);
+
                     structure.UpdateHitboxData();
                 }
             }
@@ -202,16 +207,16 @@ int main()
                     for (size_t i = 0; i < structureManager.GetTotalStructures(); ++i)
                     {
                         Structure& structure = structureManager.GetStructureByIndex(i);
-
+                        Wardrobe newWardrobe = manager.GetCurrentWardrobe();
                         
                         if (sceneSelector.CheckRayHit(rayOrigin, rayDir, structure))
                         {
-                           
-                            glm::vec3 newPos = sceneSelector.CalculatePlacementOnFace(
-                                structure.HitboxMin,
-                                structure.HitboxMax,
-                                rayDir
-                            );
+                            structure.SetPlacementDirection(sceneSelector.GetPlacementDirection(rayDir));
+
+                           // glm::vec3 newPos = sceneSelector.CalculatePlacementOnFace(structure.HitboxMin, structure.HitboxMax, rayDir);
+                            PlacementDirection direction = sceneSelector.GetPlacementDirection(rayDir);
+                            glm::vec3 basePosition = structure.GetBasePosition();
+                            glm::vec3 newPos = structure.GetPlacedPosition(basePosition, structure.GetPlacementDirection(), newWardrobe);
 
                             structureManager.UpdateStructurePosition(newPos);
 
