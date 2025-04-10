@@ -6,7 +6,7 @@
 #include "Converter.h"
 #include <vector>
 #include <stdexcept>
-
+#include <algorithm>
 class StructureManager {
 private:
     std::vector<Structure> structures;
@@ -18,6 +18,7 @@ public:
     void UpdateCurrentStructure(Converter& converter, Wardrobe& wardrobe);
     int GetTotalStructures();
     void CollectCombinedBufferData(std::vector<Structure::Vertex>& outVertices, std::vector<GLuint>& outIndices);
+    std::vector<std::reference_wrapper<Structure::Vertex>> CollectVertices();
     void UpdateStructurePosition(glm::vec3 newposition);
     void ShowStructureHitBoxes();
     void HideStructureHitBoxes();

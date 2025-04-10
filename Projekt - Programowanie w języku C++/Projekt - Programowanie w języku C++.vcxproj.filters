@@ -46,6 +46,12 @@
     <Filter Include="Pliki źródłowe\Structure">
       <UniqueIdentifier>{f7a35bc8-c189-46ed-abee-5179e5afcccd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Pliki nagłówkowe\InputHandler">
+      <UniqueIdentifier>{b3b144c1-980b-4db6-9ff2-a242504f527e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Pliki źródłowe\InputHandler">
+      <UniqueIdentifier>{227ee62e-6a7f-43b8-833b-88e0fb8e4840}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -123,6 +129,9 @@
     <ClCompile Include="SceneSelector.cpp">
       <Filter>Pliki źródłowe\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="InputHandler.cpp">
+      <Filter>Pliki źródłowe\InputHandler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -196,6 +205,9 @@
     </ClInclude>
     <ClInclude Include="SceneSelector.h">
       <Filter>Pliki nagłówkowe\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="InputHandler.h">
+      <Filter>Pliki nagłówkowe\InputHandler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

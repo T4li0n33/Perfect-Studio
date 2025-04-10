@@ -19,6 +19,7 @@ class Structure
 	size_t MaxIndexCount;
 	std::vector<GLuint> CuboidIndices;
 	glm::vec3 basePosition = glm::vec3(0.0f, 0.0f, 0.0f);
+	string DrawDirection;
 
 	public:
 
@@ -56,6 +57,9 @@ class Structure
 	void DrawStructure(Converter Con, Wardrobe wardrobe); //Static method (used Converter data)
 
 	//[Element drawing funciotns]
+	void SetDrawDirection(string direction);
+	string GetDrawDirection();
+	void BasePositionUpdate(Wardrobe wardrobe);
 	void DrawBottom(Converter Con, Vertex* target);
 	void DrawCrossBars(Converter Con, Vertex* target);
 	void DrawSides(Converter Con, Vertex* target);
@@ -68,7 +72,7 @@ class Structure
 	size_t GetMaxVertexCount(); //Returns MaxVertex
 	size_t GetMaxIndexCount(); //Returns MaxIndex
 	std::vector<GLuint> GetCuboidIndices(); // Returns Cuboid Indicies (used for traingle draw)
-	//std::vector<Structure::Vertex> GetVertices(); //Returns current Verticies vector
+	std::vector<Structure::Vertex> GetVertices(); //Returns current Verticies vector
 	glm::vec3 GetBasePositon(); //Return position shifted by user selection
 
 	//[Seters]
@@ -81,7 +85,7 @@ class Structure
 
 	//Hitbox related methods
 	void UpdateHitboxData();
-	void ShowHitboxes();
+	void ShowHitboxes(bool highlight);
 	void HideHitboxes();
 	void ClearVector(); // Clears the Verticies vector (one that is beeing sent to OpenGl vertex buffer)
 };

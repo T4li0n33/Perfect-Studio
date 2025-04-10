@@ -81,22 +81,28 @@ bool SceneSelector::IsNewPositionSelected(glm::vec3 position)
     return true;
 }
 
-glm::vec3 SceneSelector::CalculatePlacementOnFace(const glm::vec3& minBox, const glm::vec3& maxBox, const glm::vec3& rayDir)
+glm::vec3 SceneSelector::CalculatePlacementOnFace(const glm::vec3& minBox, const glm::vec3& maxBox, const glm::vec3& rayDir, Structure& newStructure)
 {
     // Oblicz szerokoœæ (X) i g³êbokoœæ (Z) obiektu
     float width = maxBox.x - minBox.x;
     float depth = maxBox.z - minBox.z;
+    float newX;
+    if (rayDir.x > 0)
+    {
+        newStructure.SetDrawDirection("right");
+        newX = maxBox.x;
+    }
 
-    // Kierunek raycastu wskazuje, po której stronie obiektu ma byæ nowy element
-    bool placeOnRight = (rayDir.x > 0); // jeœli rayDir.x > 0, stawiamy po prawej
-
-    // Nowa pozycja X zale¿y od kierunku raycastu
-    float newX = placeOnRight ? maxBox.x : minBox.x - width;
+    else
+    {
+        newStructure.SetDrawDirection("left");
+        newX = minBox.x;
+    }
 
     // Zachowujemy Y i Z takie same jak poprzedni obiekt
     return glm::vec3(
         newX,
-        minBox.y - 0.18f,  // lub maxBox.y, jeœli chcesz wyrównaæ do górnej krawêdzi
+        minBox.y,  // lub maxBox.y, jeœli chcesz wyrównaæ do górnej krawêdzi
         minBox.z    // lub (minBox.z + maxBox.z) / 2.0f, jeœli chcesz wycentrowaæ
     );
 }

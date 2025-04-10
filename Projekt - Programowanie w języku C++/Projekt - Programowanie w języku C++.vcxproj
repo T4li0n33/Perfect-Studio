@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClCompile Include="ConverterManager.cpp" />
     <ClCompile Include="GUI.cpp" />
+    <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="SceneSelector.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -186,6 +187,7 @@
   <ItemGroup>
     <ClInclude Include="ConverterManager.h" />
     <ClInclude Include="GUI.h" />
+    <ClInclude Include="InputHandler.h" />
     <ClInclude Include="SceneSelector.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Camera.h" />
