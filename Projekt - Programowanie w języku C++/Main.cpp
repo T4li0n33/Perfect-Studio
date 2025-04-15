@@ -207,7 +207,7 @@ int main()
             if (!Ortega_GUI.GetIO().WantCaptureMouse)
             {
                 camera.Inputs(window);
-                camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
+                camera.Matrix(45.0f, 0.1f, 100000.0f, shaderProgram, "camMatrix");
             }
 
             ImGui::End();

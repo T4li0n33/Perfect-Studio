@@ -63,48 +63,76 @@ void StructureManager::UpdateStructurePosition(glm::vec3 newposition)
 
 void StructureManager::ShowStructureHitBoxes()
 {
-    auto allVertices = CollectVertices(); // Wektor referencji
+    auto allVertices = CollectVertices();
     std::vector<std::reference_wrapper<Structure::Vertex>> allVerticesToColor;
+    std::vector<std::reference_wrapper<Structure::Vertex>> kVertices;
 
-    // ZnajdŸ wierzcho³ki z Elem_ID == "S"
+    // Separate "K" vertices and other vertices ("S")
     for (auto& vertexRef : allVertices)
     {
-        if (vertexRef.get().Elem_ID == "S")
+        if (vertexRef.get().Elem_ID == "K")
+        {
+            kVertices.push_back(vertexRef);
+        }
+        else if (vertexRef.get().Elem_ID == "S")
         {
             allVerticesToColor.push_back(vertexRef);
         }
     }
 
-    // Sortuj po Position.x (od najmniejszego do najwiêkszego)
+    // Sort regular vertices by Position.x
     std::sort(
         allVerticesToColor.begin(),
         allVerticesToColor.end(),
-        [](const std::reference_wrapper<Structure::Vertex>& a, const std::reference_wrapper<Structure::Vertex>& b) {
+        [](const auto& a, const auto& b) {
             return a.get().Position.x < b.get().Position.x;
         }
     );
 
-    // Zmieñ kolory tylko w pierwszych 24 wierzcho³kach (najbardziej "lewe")
-    for (int i = 0; i < 24 && i < allVerticesToColor.size(); i++)
+    // Sort K vertices by Position.x
+    std::sort(
+        kVertices.begin(),
+        kVertices.end(),
+        [](const auto& a, const auto& b) {
+            return a.get().Position.x < b.get().Position.x;
+        }
+    );
+
+    // Create final vector with K vertices at both ends
+    std::vector<std::reference_wrapper<Structure::Vertex>> finalVertices;
+
+    // Add first 24 K vertices (or all if less than 24)
+    size_t kCount = std::min(kVertices.size(), static_cast<size_t>(24));
+    finalVertices.insert(finalVertices.end(), kVertices.begin(), kVertices.begin() + kCount);
+
+    // Add all sorted S vertices
+    finalVertices.insert(finalVertices.end(), allVerticesToColor.begin(), allVerticesToColor.end());
+
+    // Add last 24 K vertices (or all if less than 24)
+    if (kVertices.size() > 24) {
+        finalVertices.insert(finalVertices.end(), kVertices.end() - 24, kVertices.end());
+    }
+
+    // Color the first 24 elements (prioritizing K vertices)
+    for (int i = 0; i < 24 && i < finalVertices.size(); i++)
     {
-        auto& vertex = allVerticesToColor[i].get();
+        auto& vertex = finalVertices[i].get();
         vertex.Color.x = 0.0f;
         vertex.Color.y = 1.0f;
         vertex.Color.z = 0.0f;
     }
 
-    // Zmieñ kolory tylko w ostatnich 24 wierzcho³kach (najbardziej "prawe")
-    for (size_t i = (allVerticesToColor.size() >= 24) ? allVerticesToColor.size() - 24 : 0;
-        i < allVerticesToColor.size(); i++)
+    // Color the last 24 elements (prioritizing K vertices)
+    for (size_t i = (finalVertices.size() >= 24) ? finalVertices.size() - 24 : 0;
+        i < finalVertices.size(); i++)
     {
-        auto& vertex = allVerticesToColor[i].get();
+        auto& vertex = finalVertices[i].get();
         vertex.Color.x = 0.0f;
         vertex.Color.y = 1.0f;
         vertex.Color.z = 0.0f;
     }
-
-    auto output = allVerticesToColor; // (jeœli potrzebujesz output)
 }
+
 
 void StructureManager::HideStructureHitBoxes()
 {

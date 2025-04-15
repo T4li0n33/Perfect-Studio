@@ -63,6 +63,7 @@ class Structure
 	void DrawBottom(Converter Con, Vertex* target);
 	void DrawCrossBars(Converter Con, Vertex* target);
 	void DrawSides(Converter Con, Vertex* target);
+	void DrawBlindSide(Converter Con, Vertex* target, float basex, float basez, string DrawDirection);
 	void DrawShelfs(Converter Con, Vertex* target, Wardrobe wardrobe);
 	void DrawDrawers(Converter Con, Vertex* target, Wardrobe wardrobe);
 	void DrawFronts(Converter Con, Vertex* target, Wardrobe wardrobe);

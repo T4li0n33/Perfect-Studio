@@ -328,7 +328,7 @@ float Wardrobe::GetDiaphragmSize()
     return diaphragm_size;
 }
 
-float Wardrobe::GetBlindSize()
+float Wardrobe::GetBlindSideSize()
 {
     return blind_side_size;
 }
@@ -356,6 +356,11 @@ void Wardrobe::SetSize(int i, float value)
     default:
         break;
     }
+}
+
+void Wardrobe::SetBlindSideSize(float size)
+{
+    this->blind_side_size = size;
 }
 
 void Wardrobe::SetWardrobeType(int i)// 1 - bottom / 2 - top / 3 - unusual / 4 - model_choosed / 5 - size_placed

@@ -98,7 +98,7 @@ glm::vec3 SceneSelector::CalculatePlacementOnFace(const glm::vec3& minBox, const
         newStructure.SetDrawDirection("left");
         newX = minBox.x;
     }
-
+    
     // Zachowujemy Y i Z takie same jak poprzedni obiekt
     return glm::vec3(
         newX,

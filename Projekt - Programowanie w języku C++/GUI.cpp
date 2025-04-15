@@ -211,14 +211,24 @@ void GUI::ProjectionGUI(Settings &settings, WardrobeManager& manager)
 			wardrobe.SetDrawers(0, 0);
 			int shelf_number = wardrobe.GetAmount(2);
 			float* shelf_ratio = wardrobe.shelf_ratio;
+			float blindSideSize = wardrobe.GetBlindSideSize();
 			bool ratio = wardrobe.GetAutoRatio(1);
+
+			if (wardrobe.GetWardrobeModel(4))
+			{
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);
+				ImGui::Text("Wpisz wielkosc slepego boku:");
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
+				ImGui::InputFloat("##blindSideSize", &blindSideSize);
+				wardrobe.SetBlindSideSize(blindSideSize);
+			}
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + top_margins);
 
 			ImGui::Text("Wpisz ilosc polek:");
 			ImGui::InputInt("##shelf_number", &shelf_number, 1, 10);
 			if (shelf_number > 4) { ImGui::TextColored(ImVec4(1, 0, 0, 1), "Mozesz miec tylko 4 polki!"); }// Number of shelfs
 
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);;
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + small_margin);
 			ImGui::Checkbox("Podzielic automatycznie?", &ratio); // Automatic shelf height ratio
 
 			if (!ratio)

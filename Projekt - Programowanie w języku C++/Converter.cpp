@@ -34,9 +34,9 @@ void Converter::Calculate(Wardrobe wardrobe)
 		
 		//Reset of Element Index Assigner
 		Elem_Num = 0;
-
+		bool IsWardrobeModelCorner = (wardrobe.GetWardrobeModel(4) == true);
 		//Computing the total amount of elements
-		Element* Elements = new Element[TotalElements(z, shelf_amount, drawer_amount, front_amount) + 1 + 3];
+		Element* Elements = new Element[TotalElements(z, shelf_amount, drawer_amount, front_amount, IsWardrobeModelCorner) + 1 + 3];
 
 		//Convert inputs to element attribiutes and adds them to Elements_vector
 		Bottom(x, z, Elements, veneer);
@@ -44,6 +44,7 @@ void Converter::Calculate(Wardrobe wardrobe)
 		Shelfs(x, z, shelf_amount, Elements, veneer);
 		Drawers(x, y, z, drawer_amount, Elements, wardrobe, drawer_veneer);
 		Sides(y, z, Elements, veneer);
+		if(wardrobe.GetWardrobeModel(4))BlindSide(wardrobe.GetBlindSideSize(), y, Elements, veneer);
 		Fronts(x, y, z, Elements, wardrobe, veneer);
 
 		//Delete allocated buffer
@@ -52,8 +53,14 @@ void Converter::Calculate(Wardrobe wardrobe)
 		
 }
 
-int Converter::TotalElements(float z, int shelf_amount, int drawer_number, int front_number)
+int Converter::TotalElements(float z, int shelf_amount, int drawer_number, int front_number, bool IsWardrobeModelCorner)
 {
+	int blindSide = 0;
+
+	if (IsWardrobeModelCorner)
+	{
+		blindSide = 1;
+	}
 
 	int crossbars = 2; // default amount of crossbars
 
@@ -66,7 +73,7 @@ int Converter::TotalElements(float z, int shelf_amount, int drawer_number, int f
 	//Calculates amount of horizontal objects || [crossbars / bottom-element / shelfs / drawers]
 	int horizontal_elements = crossbars + 1 + shelf_amount + drawer_number; 
 	int vertical_elements = 2 + drawer_number; //  calculates amount of vertical objects
-	int total_elements = horizontal_elements + vertical_elements + front_number; // sum of vertical and horizontal objects (depth elements not yet generated)
+	int total_elements = horizontal_elements + vertical_elements + front_number + blindSide; // sum of vertical and horizontal objects (depth elements not yet generated)
 
 	return total_elements;
 }
@@ -187,6 +194,21 @@ void Converter::Sides(float y, float z, Element* target, string veneer)
 	}
 
 	return;
+}
+
+void Converter::BlindSide(float blindSideSize, float y, Element* target, string veneer)
+{
+	float thickness = 18;
+	target[Elem_Num].x = blindSideSize;
+	target[Elem_Num].y = y;
+	target[Elem_Num].z = thickness;
+	target[Elem_Num].Elem_ID = Elem_Num;
+	target[Elem_Num].elem_type = "K";
+
+	ApplyElementVeneer('K', target, veneer);
+
+	Elements_vector.push_back(target[Elem_Num]);
+	Elem_Num++;
 }
 
 void Converter::Drawers(float x, float y, float z, int drawer_number, Element* target, Wardrobe wardrobe, string veneer)
@@ -393,6 +415,15 @@ void Converter::ApplyElementVeneer(char element_id, Element* target, string vene
 			break;
 		}
 
+		case 75:
+		{
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back("");
+			target[Elem_Num].veneer.push_back(veneer);
+			target[Elem_Num].veneer.push_back(veneer);
+			break;
+		}
+
 		default : 
 		{
 		std:_Xruntime_error("Element type not recognized");
@@ -469,7 +500,7 @@ float Converter::FrontWidth(Wardrobe wardrobe)
 
 	if (wardrobe.GetWardrobeModel(4))
 	{
-		width = wardrobe.GetBaseSettings(1) - wardrobe.GetDiaphragmSize() - 6.00f - wardrobe.GetBlindSize();
+		width = wardrobe.GetBaseSettings(1) - wardrobe.GetDiaphragmSize() - 6.00f - wardrobe.GetBlindSideSize();
 		return width;
 	}
 

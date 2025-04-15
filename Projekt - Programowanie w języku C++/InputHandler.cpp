@@ -34,12 +34,8 @@ void InputHandler::HandleRightDoubleClick(
                         rayDir,
                         structureManager.GetCurrentStructure());
 
-                    structureManager.UpdateStructurePosition(newPos);
+                        structureManager.UpdateStructurePosition(newPos);
 
-                    bool lokalna = newPos != glm::vec3(0.0f);
-
-                    if (lokalna)
-                    {
                         structureManager.HideStructureHitBoxes();
                         newStructureFlag = false;
                         settings.SetMode(3);
@@ -47,7 +43,7 @@ void InputHandler::HandleRightDoubleClick(
                         ImGui::SetNextWindowCollapsed(false);
                         ImGui::Begin("Tryb Projektowy");
                         ImGui::End();
-                    }
+                    
                     break;
                 }
             }

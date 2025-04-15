@@ -248,6 +248,7 @@ void Structure::DrawStructure(Converter Con, Wardrobe wardrobe)
 	Vertex* vertices = new Vertex[VertexAmount + 1];
 	BasePositionUpdate(wardrobe);
 	DrawSides(Con, vertices);
+	DrawBlindSide(Con, vertices, wardrobe.GetBaseSettings('x'), wardrobe.GetBaseSettings('z'), DrawDirection);
 	DrawBottom(Con, vertices);
 	DrawCrossBars(Con, vertices);
 	DrawShelfs(Con, vertices, wardrobe);
@@ -345,7 +346,7 @@ void Structure::UpdateHitboxData()
 	bool first = true;
 
 	for (const auto& v : Vertices) {
-		if (v.Elem_ID && strcmp(v.Elem_ID, "S") == 0) {
+		if (v.Elem_ID && strcmp(v.Elem_ID, "S") == 0 || v.Elem_ID == "K") {
 			HitboxVertices.push_back(v.Position);
 
 			// Oblicz AABB w tej samej pêtli
@@ -523,6 +524,39 @@ void Structure::DrawSides(Converter Con, Vertex* target)
 
 	}
 	return;
+}
+
+void Structure::DrawBlindSide(Converter Con, Vertex* target, float basex, float basez, string DrawDirection)
+{
+
+	int size = Con.Elements_vector.size();
+	float finalX = 0.0f;
+	glm::vec3 transform = vec3(0.0f, 0.0f, 0.0f);
+	for (int z = 0; z < size; z++)
+	{
+		if (Con.Elements_vector[z].elem_type == "K")
+		{
+			if (DrawDirection == "left")
+			{
+				finalX = 0.0f;
+			}
+			else 
+			{ 
+				finalX = (basex - Con.Elements_vector[z].x);
+			}
+			transform = vec3((finalX) / SCALE, 0.0f, basez / SCALE);
+			CreateStruct(z, 0, Con, target);
+
+			for (int x = 0; x < vertex_on_one_elem; x++)
+			{
+				target[x].Position = target[x].Position + transform + basePosition;
+				target[x].Elem_ID = "K";
+				Vertices.push_back(target[x]);
+			}
+		}
+
+	}
+
 }
 
 void Structure::DrawCrossBars(Converter Con, Vertex* target)
@@ -733,10 +767,21 @@ void Structure::DrawFronts(Converter Con, Vertex* target, Wardrobe wardrobe)
 
 	// Variable holding the sum of shifts for the current transformations
 	int result = 0;
+	float CornerFrontX;
+
 
 	// Loop processing all elements of type "L" and applying transformations
 	for (int z = 0; z < size; z++)
 	{
+		if (DrawDirection == "left")
+		{
+			CornerFrontX = (wardrobe.GetBaseSettings('x') - Con.Elements_vector[z].x);
+		}
+		else
+		{
+			CornerFrontX = 0.0f;
+		}
+
 		if (Con.Elements_vector[z].elem_type == "L" && !Con.Elements_vector[z].alreadydrawn)
 		{
 			// Call the function to create the structure for the element at index `z`
@@ -747,14 +792,14 @@ void Structure::DrawFronts(Converter Con, Vertex* target, Wardrobe wardrobe)
 			{
 				// Calculate the shift on the x-axis based on the `table` array
 				result = result + table[p];
-				transform = vec3((result + (p * 3)) / SCALE, 0.0f, wardrobe.GetBaseSettings(3) / SCALE);
+				transform = vec3((result + (p * 3) + CornerFrontX)  / SCALE, 0.0f, wardrobe.GetBaseSettings(3) / SCALE);
 				p++;
 			}
 			else
 			{
 				// Calculate the shift on the y-axis based on the `table` array
 				result = result + table[p];
-				transform = vec3(0.0f, (result + (p * 3)) / SCALE, wardrobe.GetBaseSettings(3) / SCALE);
+				transform = vec3(0.0f, (result + (p * 3) + CornerFrontX) / SCALE, wardrobe.GetBaseSettings(3) / SCALE);
 				p++;
 			}
 

@@ -40,7 +40,7 @@ public:
 	void Calculate(Wardrobe wardrobe); 
 
 	//Method to calculete total amount of elements to draw
-	int TotalElements(float z, int shelf_amount, int drawer_number, int front_number);
+	int TotalElements(float z, int shelf_amount, int drawer_number, int front_number, bool IsWardrobeModelCorner);
 
 	//[Calc Functions] - used to append elements to an "Elements_vector"
 	
@@ -51,6 +51,8 @@ public:
 	void Bottom(float x, float z, Element* target, string veneer);
 
 	void Sides(float y, float z, Element* target, string veneer);
+
+	void BlindSide(float blindSideSize, float y, Element* target, string veneer);
 
 	void Drawers(float x, float y, float z, int drawer_number, Element* target, Wardrobe wardrobe, string veneer);
 

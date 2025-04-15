@@ -1,130 +1,261 @@
 #pragma once
 #include <string>
 
-
+/**
+ * Represents a customizable wardrobe unit with configurable:
+ * - Types (bottom, top, unusual)
+ * - Models (shelf, drawer, corner, cargo)
+ * - Dimensions and component ratios
+ * - Front panel options
+ * - Material selections
+ */
 class Wardrobe
 {
-	bool wardrobe_type_bottom = false;
-	bool wardrobe_type_top = false;
-	bool wardrobe_type_unusual = false;
-	bool wardrobe_model_shelf = false;
-	bool wardrobe_model_drawer = false;
-	bool wardrobe_model_corner = false;
-	bool wardrobe_model_cargo = false;
-	bool auto_shelf_ratio = true;
-	bool auto_drawer_ratio = true;
-	bool auto_front_ratio = true;
-	bool wardrobe_corner_lemans = false;
-	bool wardrobe_corner_shelf = false;
-	bool wardrobe_type_choosed = false;
-	bool wardrobe_model_choosed = false;
-	bool wardrobe_size_placed = false;
-	bool with_front = false;
-	bool front_bool = true;
-	
+    // Type configuration flags
+    bool wardrobe_type_bottom = false;   // True for bottom-mounted units
+    bool wardrobe_type_top = false;      // True for top-mounted units
+    bool wardrobe_type_unusual = false;  // True for custom/non-standard units
 
-	float base_x = 0, base_y = 0, base_z = 0;
-	int shelf_number = 0;
-	int drawer_number = 0;
-	int wardrobe_index = 0;
-	int fronts_amount = 0;
-	int selected_drawer_color = 0; //0 = gray, 1 = white, 2 = black
-	float blind_side_size = 0.00f;
-	float diaphragm_size = 0.00f;
-	std::string veneer;
+    // Model configuration flags
+    bool wardrobe_model_shelf = false;   // Shelf-dominant configuration
+    bool wardrobe_model_drawer = false;  // Drawer-dominant configuration
+    bool wardrobe_model_corner = false;  // Corner unit configuration
+    bool wardrobe_model_cargo = false;   // Cargo-style configuration
+
+    // Automatic ratio calculation flags
+    bool auto_shelf_ratio = true;       // Auto-calculate shelf heights
+    bool auto_drawer_ratio = true;      // Auto-calculate drawer heights
+    bool auto_front_ratio = true;       // Auto-calculate front widths
+
+    // Corner-specific configurations
+    bool wardrobe_corner_lemans = false; // LeMans-style corner solution
+    bool wardrobe_corner_shelf = false;  // Shelf-style corner solution
+
+    // Configuration state trackers
+    bool wardrobe_type_choosed = false;  // True when type is selected
+    bool wardrobe_model_choosed = false; // True when model is selected
+    bool wardrobe_size_placed = false;   // True when dimensions are set
+
+    // Front panel options
+    bool with_front = false;            // True if unit has front panels
+    bool front_bool = true;             // Front panel activation state
+
+    // Physical dimensions (in millimeters)
+    float base_x = 0;  // Width dimension
+    float base_y = 0;  // Height dimension
+    float base_z = 0;  // Depth dimension
+
+    // Component quantities
+    int shelf_number = 0;     // Number of shelves
+    int drawer_number = 0;    // Number of drawers
+    int wardrobe_index = 0;   // Unit identifier
+    int fronts_amount = 0;    // Number of front panels
+
+    // Appearance settings
+    int selected_drawer_color = 0;  // 0=gray, 1=white, 2=black
+    float blind_side_size = 0.00f;   // Blind side dimension (corner units)
+    float diaphragm_size = 0.00f;    // Partition thickness
+    std::string veneer;              // Veneer material/color selection
 
 public:
-	
-	float previous_s_ratio[4] = { 0,0,0,0 };
-	float previous_d_ratio[4] = { 0,0,0,0 };
-	float previous_f_ratio[4]{ 0,0,0,0 };
-	float drawer_ratio[4]{ 0,0,0,0 };
-	float shelf_ratio[4]{ 0,0,0,0 };
-	float front_ratio[4]{ 0,0,0,0 };
-	//[Geters]
-	
-	// Returns boolean based od i-value /1=bottom/2=top/3=unusual
-	bool GetWardrobeType(int i);
+    // Ratio history buffers (stores previous configurations)
+    float previous_s_ratio[4] = { 0 };  // Previous shelf height ratios
+    float previous_d_ratio[4] = { 0 };  // Previous drawer height ratios
+    float previous_f_ratio[4] = { 0 };  // Previous front panel ratios
 
-	// Returns boolean based od i-value /1=corner_lemans/2=corner_shelf/
-	bool GetWardrobeTypeCorner(int i);
+    // Current configuration ratios
+    float drawer_ratio[4] = { 0 };  // Current drawer height distribution
+    float shelf_ratio[4] = { 0 };   // Current shelf height distribution
+    float front_ratio[4] = { 0 };   // Current front panel width distribution
 
-	// Returns boolean based od i-value /1=model_shelf/2=model_drawer/3=model_cargo/4=model_corner/
-	bool GetWardrobeModel(int i);
+    // ==================== GETTER METHODS ====================
 
-	//Returns boolean based on i-value where /1=shelf_ratio/2=drawer_ratio
-	bool GetAutoRatio(int i);
+    /**
+     * Retrieves wardrobe type status
+     * @param i Type selector: 1=bottom, 2=top, 3=unusual
+     * @return True if selected type is active
+     */
+    bool GetWardrobeType(int i);
 
+    /**
+     * Checks corner configuration type
+     * @param i Type selector: 1=leMans, 2=shelf
+     * @return True if selected corner type is active
+     */
+    bool GetWardrobeTypeCorner(int i);
 
-	//Returns Front boolean 1 - with_front /  2 - front_bool
-	bool GetFrontBool(int i);
+    /**
+     * Retrieves model configuration status
+     * @param i Model selector: 1=shelf, 2=drawer, 3=cargo, 4=corner
+     * @return True if selected model is active
+     */
+    bool GetWardrobeModel(int i);
 
-	//Returns pointer to table with saved ratio (also checks both tables for emptiness)
-	float GetShelfRatio();
-	float GetDrawerRatio();
+    /**
+     * Checks automatic ratio calculation status
+     * @param i Ratio type: 1=shelf, 2=drawer, 3=front
+     * @return True if auto-calculation is enabled
+     */
+    bool GetAutoRatio(int i);
 
-	//Returns amount of drawers - 1/shelfs - 2 / 3-fronts
-	int GetAmount(int i);
+    /**
+     * Retrieves front panel configuration
+     * @param i Option selector: 1=with_front, 2=front_bool
+     * @return Current front panel status
+     */
+    bool GetFrontBool(int i);
 
-	//Returns veener color (string)
-	std::string GetVeener();
+    /**
+     * Calculates and returns current shelf height ratio
+     * @return Dominant shelf ratio value
+     */
+    float GetShelfRatio();
 
-	//Returns id of selected drawer color
-	
-	int GetDrawerColor();
+    /**
+     * Calculates and returns current drawer height ratio
+     * @return Dominant drawer ratio value
+     */
+    float GetDrawerRatio();
 
-	int GetDrawerTexture();
+    /**
+     * Retrieves component quantities
+     * @param i Component type: 1=drawers, 2=shelves, 3=fronts
+     * @return Count of requested component
+     */
+    int GetAmount(int i);
 
-	std::string GetDrawerColor(int id);
+    /**
+     * @return Currently selected veneer material
+     */
+    std::string GetVeener();
 
-	//Checks if all needed inputs are placed
-	bool AreOptionsPicked();
-	
-	
-	float GetBaseSettings(int i);
-	float GetBaseSettings(char i);
+    /**
+     * @return Index of currently selected drawer color (0-2)
+     */
+    int GetDrawerColor();
 
-	//Returns diaphragm size
-	float GetDiaphragmSize();
+    /**
+     * Retrieves texture identifier for drawer fronts
+     * @return Texture ID based on current selection
+     */
+    int GetDrawerTexture();
 
-	//Returns size of blind side in corner wardrobe
-	float GetBlindSize();
+    /**
+     * Gets color name for specified drawer color ID
+     * @param id Color index: 0=gray, 1=white, 2=black
+     * @return String representation of color name
+     */
+    std::string GetDrawerColor(int id);
 
-	//[Seters]
+    /**
+     * Verifies all required configuration options are set
+     * @return True when unit is fully configured
+     */
+    bool AreOptionsPicked();
 
-	//Sets input value for x,y,z where /1 - x/ 2 - y / 3 - z/
-	void SetSize(int i, float value);
+    /**
+     * Retrieves base dimension by index or character
+     * @param i Dimension selector (1/2/3 or 'x'/'y'/'z')
+     * @return Requested dimension in millimeters
+     */
+    float GetBaseSettings(int i);
+    float GetBaseSettings(char i);
 
-	//Sets type // 1 - bottom / 2 - top / 3 - unusual / 4 - model_choosed / 5 - size_placed
-	void SetWardrobeType(int i);
+    /**
+     * @return Current diaphragm partition thickness
+     */
+    float GetDiaphragmSize();
 
-	//Sets boolean type of corner wardrobe / 1 - lemans / 2 - shelf
-	void SetWardrobeTypeCorner(int i);
+    /**
+     * @return Blind side dimension for corner units
+     */
+    float GetBlindSideSize();
 
-	//Sets model // 1 - shelf / 2 - drawer / 3 - corner / 4 - cargo
-	void SetWardrobeModel(int i);
+    // ==================== SETTER METHODS ====================
 
-	//Sets automatic ratio for drawers - 2(F),3(T) / shelfs 1(F), 4(T) / fronts 5(F), 6(T)
-	void SetAutoRatio(int i);
+    /**
+     * Updates wardrobe dimensions
+     * @param i Axis selector: 1=x, 2=y, 3=z
+     * @param value New dimension in millimeters
+     */
+    void SetSize(int i, float value);
 
-	//Sets boolean for front calculations (with_front - 1 is false, 2 is true)(front_boolean - 3 is false, 4 is true)
-	void SetFrontBool(int i);
+    /**
+    * Updates wardrobe blind side size (if exists)
+    * @param size Size of element in milimeters
+    */
+    void SetBlindSideSize(float size);
 
-	//Sets amount and height of shelfs in wardrobe
-	void SetShelfs(int amount, float* height);
+    /**
+     * Configures wardrobe type and state
+     * @param i Option: 1=bottom, 2=top, 3=unusual,
+     *               4=mark type chosen, 5=mark dimensions set
+     */
+    void SetWardrobeType(int i);
 
-	//Sets amount and height of drawers in wardrobe
-	void SetDrawers(int amount, float* height);
+    /**
+     * Sets corner solution type
+     * @param i Type: 1=leMans, 2=shelf
+     */
+    void SetWardrobeTypeCorner(int i);
 
-	//Sets amount and height of fronts
-	void SetFronts(int amount, float* width);
+    /**
+     * Configures wardrobe model
+     * @param i Model: 1=shelf, 2=drawer, 3=corner, 4=cargo
+     */
+    void SetWardrobeModel(int i);
 
-	void SetDrawerColor(int color);
+    /**
+     * Toggles automatic ratio calculation
+     * @param i Option: 1=disable shelf auto, 2=disable drawer auto,
+     *               3=enable drawer auto, 4=enable shelf auto,
+     *               5=disable front auto, 6=enable front auto
+     */
+    void SetAutoRatio(int i);
 
-	void SetVeenerColor(std::string color);
+    /**
+     * Configures front panel options
+     * @param i Option: 1=disable with_front, 2=enable with_front,
+     *               3=disable front_bool, 4=enable front_bool
+     */
+    void SetFrontBool(int i);
 
-	//void SetFirstFront(bool t);
-	//[Validation and optimalization]
-	bool CheckRatioChanges();
+    /**
+     * Configures shelf layout
+     * @param amount Number of shelves
+     * @param height Array of shelf heights (ratios)
+     */
+    void SetShelfs(int amount, float* height);
+
+    /**
+     * Configures drawer layout
+     * @param amount Number of drawers
+     * @param height Array of drawer heights (ratios)
+     */
+    void SetDrawers(int amount, float* height);
+
+    /**
+     * Configures front panel layout
+     * @param amount Number of front panels
+     * @param width Array of panel widths (ratios)
+     */
+    void SetFronts(int amount, float* width);
+
+    /**
+     * Sets drawer front color
+     * @param color Index: 0=gray, 1=white, 2=black
+     */
+    void SetDrawerColor(int color);
+
+    /**
+     * Sets veneer material/color
+     * @param color Material description string
+     */
+    void SetVeenerColor(std::string color);
+
+    /**
+     * Detects ratio configuration changes
+     * @return True if any ratios were modified since last check
+     */
+    bool CheckRatioChanges();
 };
-
