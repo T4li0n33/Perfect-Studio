@@ -390,7 +390,7 @@ void GUI::ProjectionGUI_End(Settings &settings, VBO& vbo, VAO& vao, EBO& ebo, Sh
 	//bool i;
 	ImGui::Begin("Podglad 3D", &i, ImGuiWindowFlags_NoSavedSettings); //3D Projection Mode
 	if (!i)settings.SetWindow(2);
-	if (ImGui::Button("Zakoncz tryb projektowy"))
+	if (ImGui::Button("Powrot do edycji szafki"))
 	{
 		settings.SetMode(3);
 		settings.SetWindow(2);

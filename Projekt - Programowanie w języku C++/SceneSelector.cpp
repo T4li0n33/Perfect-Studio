@@ -60,18 +60,103 @@ void SceneSelector::GetAABB(const Structure& s, glm::vec3& outMin, glm::vec3& ou
     outMax = max;
 }
 
-bool SceneSelector::CheckRayHit(const glm::vec3& rayOrigin,
+bool SceneSelector::CheckRayHit(
+    const glm::vec3& rayOrigin,
     const glm::vec3& rayDir,
-    const Structure& structure) {
-    // Najpierw sprawdŸ AABB (szybki test wstêpny)
+    Structure& structure,
+    RayHitInfo* outHitInfo, std::vector<Structure::Vertex>& globalVertices)  // Dodaj opcjonalny parametr
+{
     if (!RayIntersectsAABB(rayOrigin, rayDir, structure.HitboxMin, structure.HitboxMax))
         return false;
 
-    // Jeœli potrzebujesz dok³adniejszego testu na siatce trójk¹tów:
-    // return CheckRayTriangleIntersection(rayOrigin, rayDir, structure.HitboxVertices);
-
-    return true; // Tylko test AABB
+    // Pe³ny test – trójk¹ty
+    return CheckRayTriangleIntersection(rayOrigin, rayDir, structure, globalVertices, outHitInfo);
 }
+
+
+bool SceneSelector::CheckRayTriangleIntersection(
+    const glm::vec3& rayOrigin,
+    const glm::vec3& rayDir,
+    Structure& structure, std::vector<Structure::Vertex>& globalVertices,
+    RayHitInfo* outHitInfo)
+{
+    float closestT = std::numeric_limits<float>::max();
+    bool hit = false;
+
+    for (const auto& elem : structure.ElementVector) {
+        bool allVerticesHitAvailable = true;
+        for (const auto& index : elem.Indices) {
+            if (index >= globalVertices.size() || !globalVertices[index].HitAvailable) {
+                allVerticesHitAvailable = false;
+                break;
+            }
+        }
+        if (!allVerticesHitAvailable) {
+            continue; // Pomijamy element, jeœli którykolwiek wierzcho³ek nie mo¿e byæ trafiony
+        }
+
+        const auto& inds = elem.Indices;
+
+        if (inds.empty() || inds.size() % 3 != 0) {
+            std::cerr << "B³¹d: nieprawid³owa liczba indeksów w elemencie!" << std::endl;
+            continue;
+        }
+
+        for (size_t i = 0; i + 2 < inds.size(); i += 3) {
+            // SprawdŸ, czy indeksy nie wykraczaj¹ poza zakres GLOBALNEJ tablicy
+            if (inds[i] >= globalVertices.size() ||
+                inds[i + 1] >= globalVertices.size() ||
+                inds[i + 2] >= globalVertices.size())
+            {
+                std::cerr << "Ostrze¿enie: indeks wykracza poza globaln¹ tablicê wierzcho³ków. Pomijanie trójk¹ta." << std::endl;
+                continue;
+            }
+
+            const Structure::Vertex& vert0 = globalVertices[inds[i]];
+            const Structure::Vertex& vert1 = globalVertices[inds[i + 1]];
+            const Structure::Vertex& vert2 = globalVertices[inds[i + 2]];
+
+            const glm::vec3& v0 = vert0.Position;
+            const glm::vec3& v1 = vert1.Position;
+            const glm::vec3& v2 = vert2.Position;
+
+            glm::vec3 edge1 = v1 - v0;
+            glm::vec3 edge2 = v2 - v0;
+            glm::vec3 h = glm::cross(rayDir, edge2);
+            float a = glm::dot(edge1, h);
+
+            if (std::fabs(a) < 1e-6f)
+                continue;
+
+            float f = 1.0f / a;
+            glm::vec3 s = rayOrigin - v0;
+            float u = f * glm::dot(s, h);
+            if (u < 0.0f || u > 1.0f)
+                continue;
+
+            glm::vec3 q = glm::cross(s, edge1);
+            float v = f * glm::dot(rayDir, q);
+            if (v < 0.0f || u + v > 1.0f)
+                continue;
+
+            float t = f * glm::dot(edge2, q);
+            if (t > 1e-6f && t < closestT) {
+                closestT = t;
+                hit = true;
+
+                if (outHitInfo) {
+                    outHitInfo->ElemID = vert0.Elem_ID;
+                    outHitInfo->Normal = glm::normalize(glm::cross(edge1, edge2));
+                    outHitInfo->HitPoint = rayOrigin + rayDir * t;
+                }
+            }
+        }
+    }
+
+    return hit;
+}
+
+
 
 bool SceneSelector::IsNewPositionSelected(glm::vec3 position)
 {
@@ -81,30 +166,50 @@ bool SceneSelector::IsNewPositionSelected(glm::vec3 position)
     return true;
 }
 
-glm::vec3 SceneSelector::CalculatePlacementOnFace(const glm::vec3& minBox, const glm::vec3& maxBox, const glm::vec3& rayDir, Structure& newStructure)
+glm::vec3 SceneSelector::CalculatePlacementOnFace(const glm::vec3& minBox, const glm::vec3& maxBox,const glm::vec3& rayDir, const char* FatherStructureRotation,
+    Structure& newStructure, const RayHitInfo& hitInfo)
 {
-    // Oblicz szerokoœæ (X) i g³êbokoœæ (Z) obiektu
     float width = maxBox.x - minBox.x;
     float depth = maxBox.z - minBox.z;
     float newX;
-    if (rayDir.x > 0)
-    {
-        newStructure.SetDrawDirection("right");
-        newX = maxBox.x;
+
+    if (hitInfo.ElemID == "K") {
+        // Trafiliœmy naro¿nik
+        if (rayDir.x > 0)
+        {
+            newStructure.SetDrawDirection("corner_right");
+            newStructure.SetStructureRotation(FatherStructureRotation);
+        }      
+        else
+        {
+            newStructure.SetDrawDirection("corner_left");
+            newStructure.SetStructureRotation(FatherStructureRotation);
+        }
+            
+
+        // Dopasuj pozycjê – np. z prawej strony naro¿nika
+        newX = rayDir.x > 0 ? maxBox.x : minBox.x;
+    }
+    else {
+        // Domyœlna logika – element "S"
+        if (rayDir.x > 0) {
+            newStructure.SetDrawDirection("right");
+            newStructure.SetStructureRotation(FatherStructureRotation);
+            newX = maxBox.x;
+        }
+        else {
+            newStructure.SetDrawDirection("left");
+            newStructure.SetStructureRotation(FatherStructureRotation);
+            newX = minBox.x;
+        }
     }
 
-    else
-    {
-        newStructure.SetDrawDirection("left");
-        newX = minBox.x;
-    }
-    
-    // Zachowujemy Y i Z takie same jak poprzedni obiekt
     return glm::vec3(
         newX,
-        minBox.y,  // lub maxBox.y, jeœli chcesz wyrównaæ do górnej krawêdzi
-        minBox.z    // lub (minBox.z + maxBox.z) / 2.0f, jeœli chcesz wycentrowaæ
+        minBox.y,
+        minBox.z // lub centrowanie jak chcesz
     );
 }
+
 
 

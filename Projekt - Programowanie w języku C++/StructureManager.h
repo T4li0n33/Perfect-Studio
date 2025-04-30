@@ -7,6 +7,8 @@
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
+#include <iostream>
+#include <set>
 class StructureManager {
 private:
     std::vector<Structure> structures;
@@ -17,6 +19,7 @@ public:
     Structure& GetCurrentStructure();
     void UpdateCurrentStructure(Converter& converter, Wardrobe& wardrobe);
     int GetTotalStructures();
+    void GenerateGlobalIndices();
     void CollectCombinedBufferData(std::vector<Structure::Vertex>& outVertices, std::vector<GLuint>& outIndices);
     std::vector<std::reference_wrapper<Structure::Vertex>> CollectVertices();
     void UpdateStructurePosition(glm::vec3 newposition);

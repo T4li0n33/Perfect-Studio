@@ -36,6 +36,7 @@ using namespace std;
 int main()
 {
    // FreeConsole();
+    SetConsoleOutputCP(CP_UTF8);
     Settings settings;
     WardrobeManager manager;
     ConverterManager converterManager;
@@ -131,6 +132,7 @@ int main()
                     structure.UpdateHitboxData();
                 }
             }
+            structureManager.GenerateGlobalIndices();
 
 
             VAO1.Bind();

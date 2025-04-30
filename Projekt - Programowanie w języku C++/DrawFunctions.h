@@ -20,6 +20,8 @@ class Structure
 	std::vector<GLuint> CuboidIndices;
 	glm::vec3 basePosition = glm::vec3(0.0f, 0.0f, 0.0f);
 	string DrawDirection;
+	const char* Rotation;
+	const char* FatherStructureRotation = "x";
 
 	public:
 
@@ -40,19 +42,29 @@ class Structure
 			Vec2 Texture;
 			float TexIndex;
 			const char* Elem_ID;
+			bool HitAvailable = false;
 		};
 
+		struct ElementData {
+			std::string ID;
+			std::vector<Vertex> Vertices;
+			std::vector<GLuint> Indices;
+			glm::vec3 HitboxMin;
+			glm::vec3 HitboxMax;
+		};
 
 	Structure(Converter Con, Wardrobe Wardrobe);
 	~Structure();
 	std::vector<Vertex> Vertices;
 
+	std::vector<ElementData> ElementVector;
 	std::vector<glm::vec3> HitboxVertices; 
 	glm::vec3 HitboxMin, HitboxMax;
 
 	//[Object Generators]
 	void CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex* target); // Creates a single Cuboid based on passed values
-	void Create_Indicies(int loop_amount); // Generates Indices (patterns) of triangles that will be made
+	//void Create_Indicies(int loop_amount); // Generates Indices (patterns) of triangles that will be made
+	//void Create_Indicies(); //Generates Indices (patterns) of trinagle that will be drawn
 	void SetVariables(size_t MaxStructures); // Sets all Structure Class members (such as MaxQuadCount, MaxVertexCount, MaxIndexCount)
 	void DrawStructure(Converter Con, Wardrobe wardrobe); //Static method (used Converter data)
 
@@ -60,6 +72,7 @@ class Structure
 	void SetDrawDirection(string direction);
 	string GetDrawDirection();
 	void BasePositionUpdate(Wardrobe wardrobe);
+	glm::vec3 RotateElement(Vertex v, const char* FatherStructureRotation);
 	void DrawBottom(Converter Con, Vertex* target);
 	void DrawCrossBars(Converter Con, Vertex* target);
 	void DrawSides(Converter Con, Vertex* target);
@@ -75,10 +88,11 @@ class Structure
 	std::vector<GLuint> GetCuboidIndices(); // Returns Cuboid Indicies (used for traingle draw)
 	std::vector<Structure::Vertex> GetVertices(); //Returns current Verticies vector
 	glm::vec3 GetBasePositon(); //Return position shifted by user selection
+	const char* GetStructureRotation();
 
 	//[Seters]
 	void SetStructureBasePosition(glm::vec3 positon);
-
+	void SetStructureRotation(const char* FatherStructureRotation);
 	//[General Methods]
 	void CheckVennerConfig(vector<string> veneer_config);
 	void UpdateStructure(Converter Con);
