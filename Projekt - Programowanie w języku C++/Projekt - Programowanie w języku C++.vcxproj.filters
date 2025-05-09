@@ -132,6 +132,9 @@
     <ClCompile Include="InputHandler.cpp">
       <Filter>Pliki źródłowe\InputHandler</Filter>
     </ClCompile>
+    <ClCompile Include="Exporter.cpp">
+      <Filter>Pliki źródłowe\Converter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -208,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="InputHandler.h">
       <Filter>Pliki nagłówkowe\InputHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="Exporter.h">
+      <Filter>Pliki nagłówkowe\Converter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

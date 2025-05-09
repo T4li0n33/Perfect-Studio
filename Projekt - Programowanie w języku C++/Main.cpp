@@ -1,3 +1,9 @@
+#define NOMINMAX
+#define NOGDI
+#define WIN32_LEAN_AND_MEAN
+#ifdef byte
+#undef byte
+#endif
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
@@ -30,6 +36,7 @@
 #include "StructureManager.h"
 #include "SceneSelector.h"
 #include "InputHandler.h"
+#include "Exporter.h"
 
 using namespace std;
 
@@ -182,6 +189,7 @@ int main()
                 VBO1.Unbind();
                 EBO1.Unbind();
             }
+
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20.0f);
             if (ImGui::Button("Dodaj kolejna szafke"))
             {   
@@ -193,6 +201,11 @@ int main()
                     structureManager.AddNewStructure(converterManager.GetCurrentConverter(), manager.GetCurrentWardrobe());
                     structureManager.ShowStructureHitBoxes();
                 }
+            }
+
+            if (ImGui::Button("Wyeksportuj projekt"))
+            {
+                Exporter::ExportToCSV(converterManager);
             }
 
             InputHandler::HandleRightDoubleClick(

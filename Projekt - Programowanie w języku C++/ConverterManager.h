@@ -14,6 +14,7 @@ public:
     void AddNewConverter();
     Converter& GetCurrentConverter();
     Converter& GetConverterByIndex(int i);
+    std::vector<Converter> GetAllConverters();
 };
 
 #endif 

@@ -22,3 +22,8 @@ Converter& ConverterManager::GetConverterByIndex(int i)
         throw std::out_of_range("Nieprawid³owy indeks struktury!");
     }
 }
+
+std::vector<Converter> ConverterManager::GetAllConverters()
+{
+    return converters;
+}

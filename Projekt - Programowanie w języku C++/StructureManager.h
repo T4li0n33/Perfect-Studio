@@ -4,6 +4,7 @@
 #include "DrawFunctions.h"
 #include "Wardrobe.h"
 #include "Converter.h"
+#include "SceneSelector.h"
 #include <vector>
 #include <stdexcept>
 #include <algorithm>
@@ -22,7 +23,7 @@ public:
     void GenerateGlobalIndices();
     void CollectCombinedBufferData(std::vector<Structure::Vertex>& outVertices, std::vector<GLuint>& outIndices);
     std::vector<std::reference_wrapper<Structure::Vertex>> CollectVertices();
-    void UpdateStructurePosition(glm::vec3 newposition);
+    void UpdateStructurePosition(glm::vec3 newposition, SceneSelector::RayHitInfo hitInfo);
     void ShowStructureHitBoxes();
     void HideStructureHitBoxes();
     Structure& GetStructureByIndex(int i);

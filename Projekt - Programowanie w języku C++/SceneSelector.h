@@ -2,6 +2,7 @@
 #include <glm/fwd.hpp>
 #include <iostream>
 #include "DrawFunctions.h"
+
 class SceneSelector
 {
 	//void CheckDoubleClick();
@@ -10,6 +11,8 @@ public:
 		std::string ElemID;
 		glm::vec3 Normal;    // opcjonalnie: wektor normalny powierzchni
 		glm::vec3 HitPoint;  // opcjonalnie: miejsce trafienia
+		glm::vec3 MaxBox;
+		glm::vec3 MinBox;
 	};
 	bool RayIntersectsAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& min, const glm::vec3& max);
 	bool CheckRayHit(const glm::vec3& rayOrigin, const glm::vec3& rayDir, Structure& structure, RayHitInfo* outHitInfo, std::vector<Structure::Vertex>& globalVertices);

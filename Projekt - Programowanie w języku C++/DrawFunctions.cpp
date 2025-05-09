@@ -1,4 +1,4 @@
-#include "DrawFunctions.h"
+ï»¿#include "DrawFunctions.h"
 
 using namespace glm;
 constexpr auto vertex_on_one_elem = 24;
@@ -8,100 +8,11 @@ constexpr auto vertex_on_one_side = vertex_on_one_elem/6;
 constexpr auto front_texture_id = 1;
 constexpr auto SCALE = 100.0f;
 
-//void Structure::Create_Indicies(int loop_amount)
-//{
-//
-//	// CuboidIndices prepering
-//	CuboidIndices.clear();
-//	CuboidIndices.shrink_to_fit();
-//
-//	
-//	GLuint table[] = {
-//		// Bottom side (wierzcho³ki 0, 1, 2, 3)
-//		0, 1, 2, 2, 3, 0,
-//
-//		// Top side (wierzcho³ki 4, 5, 6, 7)
-//		4, 5, 6, 6, 7, 4,
-//
-//		// Front side (wierzcho³ki 8, 9, 10, 11)
-//		8, 9, 10, 10, 11, 8,
-//
-//		// Back side (wierzcho³ki 12, 13, 14, 15)
-//		12, 13, 14, 14, 15, 12,
-//
-//		// Left side (wierzcho³ki 16, 17, 18, 19)
-//		16, 17, 18, 18, 19, 16,
-//
-//		// Right side (wierzcho³ki 20, 21, 22, 23)
-//		20, 21, 22, 22, 23, 20
-//	};
-//
-//	
-//	int requiredSize = loop_amount * 36; // 36 indicies on one cuboid
-//	if (MaxIndexCount + 1 < requiredSize) {
-//		throw std::logic_error("MaxIndexCount is too small for the required number of elements.");
-//	}
-//
-//	
-//	GLuint* CuboidID = new GLuint[requiredSize];
-//
-//	// Filling up CuboidID
-//	for (int cuboid_number = 0; cuboid_number < loop_amount; cuboid_number++) {
-//		int next_cuboid_id = vertex_on_one_elem * cuboid_number; // Shift it by 24 on each iteration
-//		for (int i = 0; i < 36; i++) {
-//			int index = i + cuboid_number * 36;
-//			if (index >= requiredSize) {
-//				delete[] CuboidID;
-//				throw std::overflow_error("Too many indices generated for CuboidID.");
-//			}
-//			
-//			CuboidID[index] = table[i] + next_cuboid_id;
-//		}
-//	}
-//
-//	// Copying to CuboidIndices
-//	for (int x = 0; x < requiredSize; x++) {
-//		CuboidIndices.push_back(CuboidID[x]);
-//	}
-//
-//	delete[] CuboidID;
-//	return;
-//
-//
-//}
-
-//void Structure::Create_Indicies()
-//{
-//	const GLuint pattern[36] = {
-//		0, 1, 2, 2, 3, 0,      // Bottom
-//		4, 5, 6, 6, 7, 4,      // Top
-//		8, 9, 10, 10, 11, 8,   // Front
-//		12, 13, 14, 14, 15, 12,// Back
-//		16, 17, 18, 18, 19, 16,// Left
-//		20, 21, 22, 22, 23, 20 // Right
-//	};
-//
-//	GLuint vertexOffset = 0;
-//
-//	for (auto& elem : ElementVector)
-//	{
-//		elem.Indices.clear();
-//		elem.Indices.reserve(36);
-//
-//		for (int i = 0; i < 36; ++i)
-//		{
-//			elem.Indices.push_back(pattern[i] + vertexOffset);
-//		}
-//
-//		vertexOffset += static_cast<GLuint>(elem.Vertices.size()); // powinno byæ 24
-//	}
-//}
-
 
 void Structure::CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex* target)//Creating cuboid based on input values
 {
 	int i = 0;
-	// Dolna œciana (Bottom face)
+	// Dolna Å›ciana (Bottom face)
 	target[i].Position = { 0.0f, 0.0f, 0.0f };
 	target[i].Color = { 0.5f, 0.5f, 0.5f };
 	target[i].Texture = { 0.0f, 0.0f };
@@ -126,7 +37,7 @@ void Structure::CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex*
 	target[i].TexIndex = TexIndex;
 	i++;
 
-	// Górna œciana (Top face)
+	// GÃ³rna Å›ciana (Top face)
 	target[i].Position = { 0.0f, Con.Elements_vector[elem_id].y / SCALE, 0.0f };
 	target[i].Color = { 0.5f, 0.5f, 0.5f };
 	target[i].Texture = { 0.0f, 0.0f };
@@ -151,7 +62,7 @@ void Structure::CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex*
 	target[i].TexIndex = TexIndex;
 	i++;
 
-	// Przednia œciana (Front face)
+	// Przednia Å›ciana (Front face)
 	target[i].Position = { 0.0f, 0.0f, Con.Elements_vector[elem_id].z / SCALE };
 	target[i].Color = { 0.5f, 0.5f, 0.5f };
 	target[i].Texture = { 0.0f, 0.0f };
@@ -176,7 +87,7 @@ void Structure::CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex*
 	target[i].TexIndex = TexIndex;
 	i++;
 
-	// Tylna œciana (Back face)
+	// Tylna Å›ciana (Back face)
 	target[i].Position = { 0.0f, 0.0f, 0.0f };
 	target[i].Color = { 0.5f, 0.5f, 0.5f };
 	target[i].Texture = { 0.0f, 0.0f };
@@ -201,7 +112,7 @@ void Structure::CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex*
 	target[i].TexIndex = TexIndex;
 	i++;
 
-	// Lewa œciana (Left face)
+	// Lewa Å›ciana (Left face)
 	target[i].Position = { 0.0f, 0.0f, 0.0f };
 	target[i].Color = { 0.5f, 0.5f, 0.5f };
 	target[i].Texture = { 0.0f, 0.0f };
@@ -226,7 +137,7 @@ void Structure::CreateStruct(int elem_id, float TexIndex, Converter Con, Vertex*
 	target[i].TexIndex = TexIndex;
 	i++;
 
-	// Prawa œciana (Right face)
+	// Prawa Å›ciana (Right face)
 	target[i].Position = { Con.Elements_vector[elem_id].x / SCALE, 0.0f, 0.0f };
 	target[i].Color = { 0.5f, 0.5f, 0.5f };
 	target[i].Texture = { 0.0f, 0.0f };
@@ -346,19 +257,19 @@ void Structure::VeneerTexture(Converter Con, float veneer_id, int element_id, Ve
 
 	if ((Con.Elements_vector[element_id].z == thickness) || (Con.Elements_vector[element_id].z == drawer_thickness)) // Left, Right, Top, Bottom
 	{
-		int startIndices[4] = { 0, 4, 16, 20 }; // Indeksy pocz¹tkowe dla kolejnych boków
+		int startIndices[4] = { 0, 4, 16, 20 }; // Indeksy poczÄ…tkowe dla kolejnych bokÃ³w
 	
-		// PrzejdŸ przez ka¿dy z 4 boków
+		// PrzejdÅº przez kaÅ¼dy z 4 bokÃ³w
 		for (int i = 0; i < 4; i++)
 		{
-			int startIndex = startIndices[i]; // Pobierz pocz¹tkowy indeks dla boku
+			int startIndex = startIndices[i]; // Pobierz poczÄ…tkowy indeks dla boku
 
-			// Wybierz teksturê na podstawie veneer_config
+			// Wybierz teksturÄ™ na podstawie veneer_config
 			float texIndex = 3;
 			if (veneer_config.at(i) == "")
 				 texIndex = 0;
 			
-			// Zastosuj teksturê do 4 wierzcho³ków na aktualnym boku
+			// Zastosuj teksturÄ™ do 4 wierzchoÅ‚kÃ³w na aktualnym boku
 			for (int j = 0; j < vertex_on_one_side; j++)
 			{
 				target[startIndex + j].TexIndex = texIndex;
@@ -376,7 +287,7 @@ void Structure::UpdateHitboxData()
 		if (v.Elem_ID && strcmp(v.Elem_ID, "S") == 0 || v.Elem_ID == "K") {
 			HitboxVertices.push_back(v.Position);
 
-			// Oblicz AABB w tej samej pêtli
+			// Oblicz AABB w tej samej pÄ™tli
 			if (first) {
 				HitboxMin = HitboxMax = v.Position;
 				first = false;
@@ -466,17 +377,26 @@ void Structure::SetStructureBasePosition(glm::vec3 positon)
 	this->basePosition = positon;
 }
 
-void Structure::SetStructureRotation(const char* FatherStructureRotation)
+void Structure::SetStructureRotation(glm::vec3 normal)
 {
-	if (FatherStructureRotation = "x")
+	if (std::abs(normal.x) > 0.5f)
 	{
-		this->Rotation = "z";
+		Rotation = "x";
+	}
+	else if (std::abs(normal.y) > 0.5f)
+	{
+		Rotation = "y";
+	}
+	else if (std::abs(normal.z) > 0.5f)
+	{
+		Rotation = "z";
 	}
 	else
 	{
-		this->Rotation = "x";
+		Rotation = ""; // Brak rotacji lub nieznana normalna
 	}
 }
+
 
 void Structure::SetVariables(size_t MaxStructures)
 {
@@ -506,42 +426,38 @@ void Structure::BasePositionUpdate(Wardrobe wardrobe)
 	{
 		basePosition.y = basePosition.y - (thickness / SCALE);
 	}
-	//if (DrawDirection == "corner_right") {
-	//	Rotation = "z";
-	//}
-	//else if (DrawDirection == "corner_left") {
-	//	Rotation = "z";
-	//}
 }
 
-glm::vec3 Structure::RotateElement(Vertex v, const char* FatherStructureRotation)
+glm::vec3 Structure::RotateElement(const Vertex& v)
 {
-	vec3 rotatedPosition = v.Position; // Domyœlnie bez rotacji
+	glm::vec3 p = v.Position;
 
-	if (DrawDirection == "corner_right")
+	if (Rotation == "x")
 	{
-		rotatedPosition = vec3(
-			v.Position.z,
-			v.Position.y,
-			-v.Position.x
-		);
+		// Rotacja 90Â° wokÃ³Å‚ osi X (Y <-> Z)
+		return glm::vec3(p.x, p.y, p.z);
 	}
-	else if (DrawDirection == "corner_left")
+	else if (Rotation == "y")
 	{
-		rotatedPosition = vec3(
-			-v.Position.z,
-			v.Position.y,
-			v.Position.x
-		);
+		
+		// Rotacja 90Â° wokÃ³Å‚ osi Y (X <-> Z)
+		return glm::vec3(-p.y, p.x, p.z);
+
+	}
+	else if (Rotation == "z")
+	{
+		if (this->DrawDirection == "corner_left" || this->DrawDirection == "left")
+		// Rotacja 90Â° wokÃ³Å‚ osi Z (X <-> Y)
+		return glm::vec3(p.z, p.y, p.x);
+
+		else return glm::vec3(-p.z, p.y, p.x);
 	}
 
-	if (FatherStructureRotation && strcmp(FatherStructureRotation, "x") == 0)
-	{
-		return glm::vec3();
-	}
-
-	return rotatedPosition;
+	return p; 
 }
+
+
+
 
 void Structure::DrawBottom(Converter Con, Vertex* target)
 {
@@ -558,11 +474,10 @@ void Structure::DrawBottom(Converter Con, Vertex* target)
 			element.ID = "B";
 
 			for (int x = 0; x < vertex_on_one_elem; x++) {
-				glm::vec3 rotated = RotateElement(target[x], FatherStructureRotation);
-				target[x].Position += transform + basePosition + rotated;
+				target[x].Position = transform + basePosition + RotateElement(target[x]);
 				target[x].Elem_ID = "B";
-				Vertices.push_back(target[x]);               // Stare podejœcie
-				element.Vertices.push_back(target[x]);       // Nowe podejœcie
+				Vertices.push_back(target[x]);
+				element.Vertices.push_back(target[x]);
 			}
 
 			// Wylicz hitbox:
@@ -615,9 +530,10 @@ void Structure::DrawSides(Converter Con, Vertex* target)
 			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
 	
-				target[x].Position = target[x].Position + transform + basePosition;
+				target[x].Position += transform;
+				target[x].Position = RotateElement(target[x]) + basePosition;
 				target[x].Elem_ID = "S";
-				Vertices.push_back(target[x]);               // Stare podejœcie
+				Vertices.push_back(target[x]);
 				element.Vertices.push_back(target[x]);
 			}
 
@@ -716,7 +632,7 @@ void Structure::DrawCrossBars(Converter Con, Vertex* target)
 			{
 			case 1:
 				transform = vec3(side_width, side_height, 0.0f);
-				if(Con.GetWardrobeType() == 2) transform = vec3(side_width, side_height - 0.18f, 0.0f);
+				if(Con.GetWardrobeType() == 2) transform = vec3(side_width, side_height - thickness, 0.0f);
 				next_case++;
 				break;
 			case 2:
@@ -726,8 +642,8 @@ void Structure::DrawCrossBars(Converter Con, Vertex* target)
 
 			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
-
-				target[x].Position = target[x].Position + transform + basePosition;
+				target[x].Position += transform;
+				target[x].Position = RotateElement(target[x]) + basePosition;
 				target[x].Elem_ID = "C";
 				Vertices.push_back(target[x]);
 				element.Vertices.push_back(target[x]);
@@ -785,7 +701,8 @@ void Structure::DrawShelfs(Converter Con, Vertex* target , Wardrobe wardrobe)
 			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
 				
-				target[x].Position = target[x].Position + transform + basePosition;
+				target[x].Position += transform;
+				target[x].Position = RotateElement(target[x]) + basePosition;
 				target[x].Elem_ID = "G";
 				Vertices.push_back(target[x]);
 				element.Vertices.push_back(target[x]);
@@ -845,7 +762,8 @@ void Structure::DrawDrawers(Converter Con, Vertex* target, Wardrobe wardrobe)
 			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
 
-				target[x].Position = target[x].Position + transform + basePosition;
+				target[x].Position += transform;
+				target[x].Position = RotateElement(target[x]) + basePosition;
 				target[x].Elem_ID = "F";
 				Vertices.push_back(target[x]);
 				element.Vertices.push_back(target[x]);
@@ -879,7 +797,8 @@ void Structure::DrawDrawers(Converter Con, Vertex* target, Wardrobe wardrobe)
 			for (int k = 0; k < vertex_on_one_elem; k++)
 			{
 
-				target[k].Position = target[k].Position + transform + basePosition;
+				target[k].Position += transform;
+				target[k].Position = RotateElement(target[k]) + basePosition;
 				target[k].Elem_ID = "E";
 				Vertices.push_back(target[k]);
 				element.Vertices.push_back(target[k]);
@@ -990,7 +909,8 @@ void Structure::DrawFronts(Converter Con, Vertex* target, Wardrobe wardrobe)
 			// Shift the position of the element's vertices by the transformation vector
 			for (int x = 0; x < vertex_on_one_elem; x++)
 			{
-				target[x].Position = target[x].Position + transform + basePosition;
+				target[x].Position += transform;
+				target[x].Position = RotateElement(target[x]) + basePosition;
 				target[x].Elem_ID = "L";
 				Vertices.push_back(target[x]);
 				element.Vertices.push_back(target[x]);

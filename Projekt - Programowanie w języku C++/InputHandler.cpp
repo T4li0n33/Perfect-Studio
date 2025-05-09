@@ -39,7 +39,7 @@ void InputHandler::HandleRightDoubleClick(
                         structureManager.GetCurrentStructure(),
                         hitInfo); 
 
-                    structureManager.UpdateStructurePosition(newPos);
+                    structureManager.UpdateStructurePosition(newPos, hitInfo);
 
                     structureManager.HideStructureHitBoxes();
                     newStructureFlag = false;

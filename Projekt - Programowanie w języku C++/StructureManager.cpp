@@ -90,9 +90,10 @@ std::vector<std::reference_wrapper<Structure::Vertex>> StructureManager::Collect
     return temp;
 }
 
-void StructureManager::UpdateStructurePosition(glm::vec3 newposition)
+void StructureManager::UpdateStructurePosition(glm::vec3 newposition, SceneSelector::RayHitInfo hitInfo)
 {
     Structure& structure = GetCurrentStructure();
+    structure.SetStructureRotation(hitInfo.Normal);
     structure.SetStructureBasePosition(newposition);
 }
 
@@ -103,6 +104,7 @@ void StructureManager::ShowStructureHitBoxes()
     struct ElemRef {
         Structure::ElementData* elem;
         float minX;
+        float maxZ;
     };
 
     std::vector<ElemRef> allElements;
@@ -112,20 +114,25 @@ void StructureManager::ShowStructureHitBoxes()
         for (auto& elem : structure.ElementVector) {
             if (elem.Vertices.empty()) continue;
 
-            // Wylicz minimalne X jako pozycję bazową
             float minX = std::min_element(elem.Vertices.begin(), elem.Vertices.end(),
                 [](const auto& a, const auto& b) {
                     return a.Position.x < b.Position.x;
                 })->Position.x;
 
-            allElements.push_back({ &elem, minX });
+            float maxZ = std::max_element(elem.Vertices.begin(), elem.Vertices.end(),
+                [](const auto& a, const auto& b) {
+                    return a.Position.z < b.Position.z;
+                })->Position.z;
+
+            allElements.push_back({ &elem, minX, maxZ });
         }
     }
 
-    // Posortuj po X
+    // Posortuj po X rosnąco, a przy równych X po Z malejąco
     std::sort(allElements.begin(), allElements.end(),
         [](const ElemRef& a, const ElemRef& b) {
-            return a.minX < b.minX;
+            if (a.minX != b.minX) return a.minX < b.minX;
+            return a.maxZ > b.maxZ;
         });
 
     auto takeElemWindow = [&](int fromIndex, int count) {
@@ -137,16 +144,27 @@ void StructureManager::ShowStructureHitBoxes()
         };
 
     auto pickInElemWindow = [&](std::vector<ElemRef>& win, const std::string& type) {
-        std::vector<ElemRef> fil;
+        std::vector<ElemRef> filtered;
         for (auto& ref : win)
             if (!ref.elem->Vertices.empty() && ref.elem->Vertices.front().Elem_ID == type)
-                fil.push_back(ref);
-        if (!fil.empty()) return fil;
+                filtered.push_back(ref);
+
+        // Sortuj malejąco po maxZ – elementy z większym Z mają priorytet
+        auto compareByZ = [](const ElemRef& a, const ElemRef& b) {
+            return a.maxZ > b.maxZ;
+            };
+
+        if (!filtered.empty()) {
+            std::sort(filtered.begin(), filtered.end(), compareByZ);
+            return filtered;
+        }
+
+        std::sort(win.begin(), win.end(), compareByZ);
         return win;
         };
 
     // ==== LEWE OKNO ====
-    auto leftWin = takeElemWindow(0, 3);  // np. 3 elementy po lewej
+    auto leftWin = takeElemWindow(0, 3);
     bool sharedL = false;
     {
         std::set<std::tuple<float, float, float>> sPos, kPos;
@@ -180,7 +198,7 @@ void StructureManager::ShowStructureHitBoxes()
     }
 
     auto rightCandidates = pickInElemWindow(rightWin, sharedR ? "K" : "S");
-    Structure::ElementData* rightPick = rightCandidates.empty() ? nullptr : rightCandidates.back().elem;
+    Structure::ElementData* rightPick = rightCandidates.empty() ? nullptr : rightCandidates.front().elem;
 
     // ===== KOLOROWANIE + DEBUG =====
     std::cout << "\n--- ShowStructureHitBoxes Debug ---\n";
@@ -206,6 +224,7 @@ void StructureManager::ShowStructureHitBoxes()
     }
     std::cout << "--- Koniec debugowania ---\n\n";
 }
+
 
 
 

@@ -415,7 +415,7 @@ void Converter::ApplyElementVeneer(char element_id, Element* target, string vene
 			break;
 		}
 
-		case 75:
+		case 75: //Corner side (ID : K)
 		{
 			target[Elem_Num].veneer.push_back(veneer);
 			target[Elem_Num].veneer.push_back("");

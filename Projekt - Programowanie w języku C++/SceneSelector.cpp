@@ -148,6 +148,8 @@ bool SceneSelector::CheckRayTriangleIntersection(
                     outHitInfo->ElemID = vert0.Elem_ID;
                     outHitInfo->Normal = glm::normalize(glm::cross(edge1, edge2));
                     outHitInfo->HitPoint = rayOrigin + rayDir * t;
+                    outHitInfo->MaxBox = elem.HitboxMax;
+                    outHitInfo->MinBox = elem.HitboxMin;
                 }
             }
         }
@@ -172,18 +174,29 @@ glm::vec3 SceneSelector::CalculatePlacementOnFace(const glm::vec3& minBox, const
     float width = maxBox.x - minBox.x;
     float depth = maxBox.z - minBox.z;
     float newX;
+    float newZ;
 
     if (hitInfo.ElemID == "K") {
         // Trafiliœmy naro¿nik
         if (rayDir.x > 0)
         {
             newStructure.SetDrawDirection("corner_right");
-            newStructure.SetStructureRotation(FatherStructureRotation);
+            newStructure.SetStructureRotation(hitInfo.Normal);
+            return glm::vec3(
+                hitInfo.MinBox.x,
+                minBox.y,
+                hitInfo.MaxBox.z
+            );
         }      
         else
         {
             newStructure.SetDrawDirection("corner_left");
-            newStructure.SetStructureRotation(FatherStructureRotation);
+            newStructure.SetStructureRotation(hitInfo.Normal);
+            return glm::vec3(
+                hitInfo.MinBox.x,
+                minBox.y,
+                hitInfo.MaxBox.z
+            );
         }
             
 
@@ -191,15 +204,15 @@ glm::vec3 SceneSelector::CalculatePlacementOnFace(const glm::vec3& minBox, const
         newX = rayDir.x > 0 ? maxBox.x : minBox.x;
     }
     else {
-        // Domyœlna logika – element "S"
+   
         if (rayDir.x > 0) {
             newStructure.SetDrawDirection("right");
-            newStructure.SetStructureRotation(FatherStructureRotation);
+            newStructure.SetStructureRotation(hitInfo.Normal);
             newX = maxBox.x;
         }
         else {
             newStructure.SetDrawDirection("left");
-            newStructure.SetStructureRotation(FatherStructureRotation);
+            newStructure.SetStructureRotation(hitInfo.Normal);
             newX = minBox.x;
         }
     }

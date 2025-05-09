@@ -1,3 +1,4 @@
+#pragma once
 #include <glad/glad.h>
 #include <cstddef>
 #include <stdlib.h>
@@ -10,8 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#pragma once
-
+#include <glm/gtx/rotate_vector.hpp> 
 class Structure
 {
 	size_t MaxQuadCount;
@@ -53,6 +53,12 @@ class Structure
 			glm::vec3 HitboxMax;
 		};
 
+		struct RayHitInfo {
+			std::string ElemID;
+			glm::vec3 Normal;    // opcjonalnie: wektor normalny powierzchni
+			glm::vec3 HitPoint;  // opcjonalnie: miejsce trafienia
+		};
+
 	Structure(Converter Con, Wardrobe Wardrobe);
 	~Structure();
 	std::vector<Vertex> Vertices;
@@ -72,7 +78,7 @@ class Structure
 	void SetDrawDirection(string direction);
 	string GetDrawDirection();
 	void BasePositionUpdate(Wardrobe wardrobe);
-	glm::vec3 RotateElement(Vertex v, const char* FatherStructureRotation);
+	glm::vec3 RotateElement(const Vertex& v);
 	void DrawBottom(Converter Con, Vertex* target);
 	void DrawCrossBars(Converter Con, Vertex* target);
 	void DrawSides(Converter Con, Vertex* target);
@@ -92,7 +98,7 @@ class Structure
 
 	//[Seters]
 	void SetStructureBasePosition(glm::vec3 positon);
-	void SetStructureRotation(const char* FatherStructureRotation);
+	void SetStructureRotation(glm::vec3 normal);
 	//[General Methods]
 	void CheckVennerConfig(vector<string> veneer_config);
 	void UpdateStructure(Converter Con);
